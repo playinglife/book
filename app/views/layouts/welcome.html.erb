@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Book</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  </head>
+
+  <body>
+
+    <%= react_component('Application', 
+        logo: image_path('book.png'), 
+        noImage: image_path('noimage.png'),
+        books: @books,
+        signOutLink: destroy_session_path(@user)
+    ) %>
+
+    <%= yield %>
+  </body>
+</html>
+

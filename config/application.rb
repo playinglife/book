@@ -6,7 +6,7 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module Book
+module Bookamii
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.2
@@ -17,3 +17,5 @@ module Book
     # the framework and any gems in your application.
   end
 end
+
+#config.autoload_paths += ["#{config.root}/app/serializers"]
