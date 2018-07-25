@@ -1,5 +1,16 @@
 Rails.application.routes.draw do
-  get 'welcome/index'
+  #get 'books/index'
+  #get 'books/show'
+  #get 'books/create'
+  #get 'books/update'
+  #get 'books/destroy'
+  #get 'book/index'
+  #get 'book/show'
+  #get 'book/create'
+  #get 'book/update'
+  #get 'book/destroy'
+  #get 'welcome/index'
+
   devise_for :users
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -15,4 +26,7 @@ Rails.application.routes.draw do
       root 'devise/sessions#new', as: :unauthenticated_root
     end
   end
+
+    resources :books
+
 end

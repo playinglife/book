@@ -10,11 +10,12 @@
   </head>
 
   <body>
-
+    
     <%= react_component('Application', 
         logo: image_path('book.png'), 
         noImage: image_path('noimage.png'),
-        books: @books,
+        component: @component,
+        data: @books,
         signOutLink: destroy_session_path(@user)
     ) %>
 

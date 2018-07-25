@@ -5,6 +5,7 @@ class WelcomeController < ApplicationController
         @user=current_user
         @books=@user.books
         #@books.as_json(:only => [:id, :title, :description])
+        @component='BookList'
         @books.as_json    
       else
         redirect_to login_path
