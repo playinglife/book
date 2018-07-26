@@ -21,7 +21,7 @@ $success: rgb(216,183,114);
 .btn-primary:not(:disabled):not(.disabled):active:focus, 
 .btn-primary:not(:disabled):not(.disabled).active:focus, 
 .show > .btn-primary.dropdown-toggle:focus {
-    box-shadow: 0 0 0 0.2rem lighten( $primary, 25% );
+    box-shadow: 0 0 0 0.1rem lighten( $primary, 25% );
 }
 
 .btn-success, 
@@ -32,7 +32,8 @@ $success: rgb(216,183,114);
 }
 .btn-success:hover,
 .btn-success:active,
-.btn-success:focus {
+.btn-success:focus,
+.btn-success:not(:disabled):not(.disabled):active {
     background-color: darken( $success, 5% );
     border-color: darken( $success, 5% );
 }
@@ -41,7 +42,7 @@ $success: rgb(216,183,114);
 .btn-success:not(:disabled):not(.disabled):active:focus, 
 .btn-success:not(:disabled):not(.disabled).active:focus, 
 .show > .btn-success.dropdown-toggle:focus {
-    box-shadow: 0 0 0 0.2rem lighten( $primary, 25% );
+    box-shadow: 0 0 0 0.1rem lighten( $primary, 25% );
 }
 
 .btn-danger, 
@@ -52,7 +53,8 @@ $success: rgb(216,183,114);
 }
 .btn-danger:hover,
 .btn-danger:active,
-.btn-danger:focus {
+.btn-danger:focus,
+.btn-danger:not(:disabled):not(.disabled):active {
     background-color: darken( $danger, 5% );
     border-color: darken( $danger, 5% );
 }
@@ -61,7 +63,7 @@ $success: rgb(216,183,114);
 .btn-danger:not(:disabled):not(.disabled):active:focus, 
 .btn-danger:not(:disabled):not(.disabled).active:focus, 
 .show > .btn-danger.dropdown-toggle:focus {
-    box-shadow: 0 0 0 0.2rem lighten( $primary, 25% );
+    box-shadow: 0 0 0 0.1rem lighten( $primary, 25% );
 }
 
 .form-control:focus {
@@ -174,7 +176,7 @@ html{
 }
 body{
     height: 100%;
-    background: url(wallpaper1.jpg) no-repeat center center fixed;
+    background: url(wallpaper2.jpg) no-repeat center center fixed;
     background-size: cover;
 }
 
@@ -314,4 +316,11 @@ body{
 /*Change font for all*/
 body{
     font-family: 'Nunito', sans-serif;
+}
+
+/*Force bootstrap modal dialog to show*/
+.modal{
+    display: block;
+    z-index:998;
+    .close {display: none;}
 }

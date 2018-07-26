@@ -14,10 +14,11 @@
 //= require activestorage
 //= require turbolinks
 //= require jquery3
-//= require popper
 //= require bootstrap
+//= require popper
 //= require react
 //= require react_ujs
 //= require components
 //= require bootstrap-sprockets
+//= require bootstrap_confirm
 //= require_tree .

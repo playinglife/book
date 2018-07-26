@@ -71,3 +71,5 @@ gem 'react-rails'
 #gem 'autoprefixer-rails'
 gem 'active_model_serializers'
 gem 'font-awesome-rails'
+#gem 'bootstrap_confirm' Could not make it work so I have added the file manually
+gem 'popper_js'
