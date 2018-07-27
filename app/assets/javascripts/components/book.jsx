@@ -174,9 +174,10 @@ class BookList extends React.Component {
     fetch(APIUrls['Book'], {
       cache: 'reload',
       method: 'GET',
+      credentials: 'same-origin',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       }
       //body: JSON.stringify(data)
     }).then(response => response.json())
@@ -187,7 +188,7 @@ class BookList extends React.Component {
         }else{
             global.app.notify('danger','',response.message);
         }
-    });
+    }).catch(error => global.app.notify('danger','',error));
   }
 
   /*componentWillReceiveProps(newProps){

@@ -152,7 +152,7 @@ class Application extends React.Component {
             </div>
             
             <div id="the-content">
-                { this.state.component!==null ? this.loadComponent(this.state.component) : '' }
+                { this.state.component!==null ? this.loadComponent() : '' }
             </div>
             <Loader show={ this.state.loading } />
             <div className=".notifications.top-right"></div>
