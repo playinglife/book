@@ -5,6 +5,14 @@ class WelcomeController < ApplicationController
         @books=@user.books
         #@books.as_json(:only => [:id, :title, :description])
         @component='BookList'
-        @books.as_json
+        @data=[];
+        @books.each{ |book| 
+          @data.push({
+            id: book.id,
+            title:book.title,
+            description: book.description,
+            image: book.image.url
+          });
+        }
     end
 end

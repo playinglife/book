@@ -1,6 +1,6 @@
 class BooksController < ApplicationController
-  #skip_before_action :verify_authenticity_token
-  #before_action :authenticate_user!
+  skip_before_action :verify_authenticity_token
+  before_action :authenticate_user!
 
   def index
     @success=true;
@@ -12,7 +12,15 @@ class BooksController < ApplicationController
       @message='';
 
       @user=current_user
-      @data=@user.books
+      @data=[];
+      @user.books.each{ |book| 
+        @data.push({
+          id: book.id,
+          title:book.title,
+          description: book.description,
+          image: book.image.url
+        });
+      }
     else
       @success=false
       @message='You are not logged in. Please log in first.'
@@ -33,6 +41,7 @@ class BooksController < ApplicationController
         @book=Book.new;
         @book.title=params[:title];
         @book.description=params[:description];
+        @book.image=params[:file];
         @book.user=current_user;
 
         if @book.title.length==0
@@ -50,9 +59,29 @@ class BooksController < ApplicationController
             @message='Invalid data';
         end
 
-        if (@success && !@book.save())
+        @book.valid?
+        if (@book.errors.messages.length>0)
+          @success=false;
+          @message=Array.new;
+
+          @book.errors.messages.each do |key,attrMessage|
+            attrMessage.each do |errMessage|
+              @message.push errMessage
+            end
+          end
+          
+          if @message.length==1
+            @message=@message[0]
+          end
+        end
+        
+        if (@success)
+          if @book.save()
+            @message=@message+@book.image.to_json
+          else
             @success=false
             @message='Could not save data'
+          end
         end
       else
         @success=false
@@ -110,5 +139,9 @@ class BooksController < ApplicationController
             @message='You are not logged in. Please log in first.'
         end
         render json: {success: @success, message: @message, data: @data}, status: :ok    
+    end
+
+    def book_params
+      params.require(:book).permit(:title, :description, :image, :image_cache, :remove_image)
     end
 end

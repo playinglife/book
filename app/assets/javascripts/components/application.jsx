@@ -12,23 +12,14 @@ class Application extends React.Component {
     super(props);
     this.state={};
     this.state.data=this.props.data;
-    this.state.loading=false;
     this.state.component=this.props.component!==undefined?this.props.component:null;
-    this.loaders=0;     /*Loaders requested count*/
-    this.delayLoading=null;
     
     this.firstRun=true;
 
     global.app=this;
-
-    this.state.modal=false;
-    this.state.modalTitle='';
-    this.state.modalContent='';
         
     this.changeComponent.bind(this);
     this.loadComponent.bind(this);
-    this.showLoader.bind(this);
-    this.hideLoader.bind(this);
     this.notify.bind(this);
   }
   
@@ -64,40 +55,9 @@ class Application extends React.Component {
     }
   }
 
-  showLoader(event){
-      this.loaders++;
-      if (this.state.loading==false){
-        this.delayLoader=setTimeout(function(){ this.setState({loading : true}); }.bind(this),1000);
-      }
-  }
-  hideLoader(event){
-      if (this.loaders>0){ this.loaders--; }
-      if (this.loaders==0){
-        if (this.delayLoader!=null){
-            clearTimeout(this.delayLoader);
-            this.delayLoader=null;
-        }
-        this.setState({loading : false});
-      }
-  }
-
-  showModal(title, content){
-      if (this.state.modal==false){
-        this.title=title;
-        this.content=content;
-        this.setState({modal : true, modalTitle: title, modalContent: content});
-      }
-  }
-
-  hideModal(){
-      if (this.state.modal==true){
-        this.setState({modal : false});
-      }
-  }
-
   notify(type,title,message){
     $.notify({
-            icon: 'fa fa-user',
+            icon: '',
             title: title,
             message: message,
             target: '_blank'
@@ -154,20 +114,46 @@ class Application extends React.Component {
             <div id="the-content">
                 { this.state.component!==null ? this.loadComponent() : '' }
             </div>
-            <Loader show={ this.state.loading } />
+            <Loader />
             <div className=".notifications.top-right"></div>
-            <ModalWin show={ this.state.modal } title={ this.state.modalTitle } content={ this.state.modalContent } hideModal={ this.hideModal.bind(this) } />
+            <ModalWin />
         </div>
     );
   }
 }
 
 class Loader extends React.Component{
+    constructor(props){
+      super(props);
+      global.loader=this;
+      this.state={loading:false};
+      this.loaders=0;     /*Loaders requested count*/
+      this.delayLoading=null;
+      this.showLoader.bind(this);
+      this.hideLoader.bind(this);
+    }
     componentWillReceiveProps(someProps) {
       this.setState({});
     }    
+    showLoader(event){
+        this.loaders++;
+        if (this.state.loading==false){
+          this.delayLoader=setTimeout(function(){ this.setState({loading : true}); }.bind(this),1000);
+        }
+    }
+    hideLoader(event){
+        if (this.loaders>0){ this.loaders--; }
+        if (this.loaders==0){
+          if (this.delayLoader!=null){
+              clearTimeout(this.delayLoader);
+              this.delayLoader=null;
+          }
+          this.setState({loading : false});
+        }
+    }
+    
     render(){
-        if (this.props.show==true) {
+        if (this.state.loading==true) {
             return(
                 <div id="loader">
                     <div className="sk-circle">
@@ -193,27 +179,47 @@ class Loader extends React.Component{
 }
 
 class ModalWin extends React.Component{
+    constructor(props){
+      super(props);
+      global.modal=this;
+      this.state={modal:false};
+      this.state.title='';
+      this.state.content='';
+    }
     componentWillReceiveProps(someProps) {
       this.setState({});
     }    
+  showModal(title, content){
+      if (this.state.modal==false){
+        this.title=title;
+        this.content=content;
+        this.setState({modal : true, title: title, content: content});
+      }
+  }
+
+  hideModal(){
+      if (this.state.modal==true){
+        this.setState({modal : false});
+      }
+  }
 
     render(){
-        if (this.props.show==true) {
+        if (this.state.modal==true) {
             return(
                 <div className="modal" role="dialog">
                     <div className="modal-dialog" role="document">
                       <div className="modal-content">
                         <div className="modal-header">
-                          <h5 className="modal-title">{ this.props.title }</h5>
+                          <h5 className="modal-title">{ this.state.title }</h5>
                           <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
                         <div className="modal-body">
-                          <p>{ this.props.content }</p>
+                          <p>{ this.state.content }</p>
                         </div>
                         <div className="modal-footer">
-                          <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={ this.props.hideModal }>Close</button>
+                          <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={ this.hideModal.bind(this) }>Close</button>
                         </div>
                       </div>
                     </div>

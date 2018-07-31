@@ -186,8 +186,8 @@ body{
 #books .card{
     background-color: rgba(255,255,255,0.7);
     border: 1px solid #fff;
-    width: 200px;
-    height: 300px;
+    width: 220px;
+    height: 340px;
     float: left;
     margin:5px;
 }
@@ -199,16 +199,19 @@ body{
 }
 
 #books .card .card-text{
-    font-size:12px;
+    font-size:13px;
 }
     
 #books .card .card-title{
     text-align: center;
     font-size: 16px;
+    height:45px;
+    overflow:hidden;
 }
 #books .card .card-body{
     overflow: hidden;
     padding:0.5em;
+    margin-bottom: 10px;
 }
     
 #books{
@@ -323,4 +326,87 @@ body{
     display: block;
     z-index:998;
     .close {display: none;}
+    .modal-title{
+      font-size:16px;
+      word-break: break-all;
+      overflow:hidden;
+    }
+    .modal-body{
+      font-size:13px;
+      word-break: break-all;
+      overflow:hidden;
+    }
 }
+
+/*File upload css*/
+.uploader {
+  margin: 2em auto;
+  max-width: 80%;
+  text-align: center;
+  min-height: 200px;
+  position: relative;
+}
+
+.file-container {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  border:2px dashed $primary;
+  padding:3px;
+  border-radius:3px;
+  overflow:hidden;
+  div{
+    position:absolute;
+    left:0px;
+    top:0x;
+  }
+}
+
+.file-container.highlight{
+  border:2px dashed $success;
+}
+
+.file-input {
+  border: 4px dashed rgba(black, 0);
+  height: 2em;
+  transition: all 0.5s ease-in-out;
+  width: 50%;
+  border: 1px solid green;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.file-preview {
+  margin: 2em 0;
+  .preview-img{
+    width:100%;
+  }
+}
+
+.target {
+  border-color: rgba(black, 0.5);
+  height: 5em;
+  position: relative;
+  width: 100%;
+  
+  &::after {
+    background: white;
+    content: "Drop That Heavy File Here.";
+    font-size: 1.5em;
+    font-weight: 500;
+    height: 100%;
+    left: 0;
+    line-height: 1.5;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    width: 100%;
+  }
+  
+  &.hover {
+    border-color: black;
+  }
+}
+
+

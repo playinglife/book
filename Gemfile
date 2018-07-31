@@ -74,3 +74,6 @@ gem 'font-awesome-rails'
 #gem 'bootstrap_confirm' Could not make it work so I have added the file manually
 gem 'popper_js'
 gem 'bootstrap_confirm'
+gem 'mini_magick'
+gem 'carrierwave'
+gem 'carrierwave-base64'
