@@ -58,6 +58,7 @@ class NewBook extends React.Component{
     }
 
     resetFile(){
+      this.existingImage=null;
       this.setState({
         previewing: false,
         reset: true
@@ -84,8 +85,15 @@ class NewBook extends React.Component{
         let data = new FormData()
         data.append('title', root.find('#title').val());
         data.append('description', root.find('#description').val());
-        data.append('file', this.file);
-        
+        if (this.existingImage!=null){
+          data.append('file', '.'); //"." means don't update image because it's the same as the current one in the db
+        }else{
+          if (this.state.previewing==false){
+            data.append('file', null);
+          }else{
+            data.append('file', this.file);
+          }
+        }
         global.loader.showLoader();
         
         fetch(url, {
@@ -188,7 +196,7 @@ class Book extends React.Component {
   render() {
     return (
         <div className="card" ref={ this.rootRef }>
-          <img className="card-img-top" src={ this.props.image } />
+          <img className="card-img-top" src={ this.props.image+"?sync="+Date.now() } />
           <div className="card-body">
           <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.title }>{ this.props.title }</div>
           <hr/>

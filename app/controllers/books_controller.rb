@@ -103,6 +103,16 @@ class BooksController < ApplicationController
             if book.user==current_user
                 book.title=params[:title];
                 book.description=params[:description];
+                if params[:file]!="."
+                  if params[:file]=="null"
+                    book.remove_image!;
+                  else
+                     if !book.image.file.nil?
+                      book.remove_image!;
+                    end
+                    book.image=params[:file];
+                  end
+                end
                 if (!book.save())
                     @success=false
                     @message='Could not save data'

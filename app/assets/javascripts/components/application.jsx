@@ -91,9 +91,14 @@ class Application extends React.Component {
     });      
   }
 
+  cancelOnDrop(event){
+    event.preventDefault();
+    e.stopPropagation();
+  }
+
   render() {
     return (
-        <div id="container">
+        <div id="container" onDrop={ this.cancelOnDrop.bind(this) } onDragOver={ this.cancelOnDrop.bind(this) } >
             <div>
                 <ul className="sidebar-nav">
                     <li className="sidebar-brand">

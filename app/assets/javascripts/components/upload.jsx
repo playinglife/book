@@ -94,8 +94,7 @@ class FileInput extends React.Component {
       <div ref={ this.uploadRef } className= 'file-container ' onDrop={ this.handleDrop.bind(this) } onDragEnter={ this.handleDragEnter.bind(this) }
         onDragOver={ this.handleDragOver.bind(this) } onDragLeave={ this.handleDragLeave.bind(this) }>
           <div>Click or drop an image</div>
-          <input className={ "file-input " + classNames } name="upload" type="file" 
-            onChange={ this.handleChange.bind(this) } />
+          <input className={ "file-input " + classNames } name="upload" type="file" onChange={ this.handleChange.bind(this) } />
       </div>
     )
   }
@@ -117,6 +116,7 @@ class FilePreview extends React.Component {
       return(
         <div className="file-preview">
           { this.props.type.indexOf("image") > -1 ? <img className="preview-img" src={ this.props.file }/> : null }
+          { this.props.type.indexOf("image") != -1 ? <p className="preview-name">{ this.props.name }</p> : null }
           <br/><br/>
           <button className="btn btn-primary" onClick={ this.props.handleFileRemove } name="Remove File">Remove</button>
         </div>
