@@ -117,7 +117,6 @@ class FilePreview extends React.Component {
       return(
         <div className="file-preview">
           { this.props.type.indexOf("image") > -1 ? <img className="preview-img" src={ this.props.file }/> : null }
-          /*{ this.props.type.indexOf("image") != -1 ? <p className="preview-name">{ this.props.name }</p> : null }*/
           <br/><br/>
           <button className="btn btn-primary" onClick={ this.props.handleFileRemove } name="Remove File">Remove</button>
         </div>
@@ -125,3 +124,4 @@ class FilePreview extends React.Component {
     }
   }
 }
+/*{ this.props.type.indexOf("image") != -1 ? <p className="preview-name">{ this.props.name }</p> : null }*/
