@@ -1,6 +1,6 @@
 class BooksController < ApplicationController
   skip_before_action :verify_authenticity_token
-  before_action :authenticate_user!
+  #before_action :authenticate_user!
 
   def index
     @success=true;
@@ -23,7 +23,8 @@ class BooksController < ApplicationController
       }
     else
       @success=false
-      @message='You are not logged in. Please log in first.'
+      @message='redirect'
+      @data=new_user_session_url
     end
     render json: {success: @success, message: @message, data: @data}, status: :ok
   end
@@ -85,7 +86,8 @@ class BooksController < ApplicationController
         end
       else
         @success=false
-        @message='You are not logged in. Please log in first.'
+        @message='redirect'
+        @data=new_user_session_url
       end
       render json: {success: @success, message: @message, data: @data}, status: :ok
   end
@@ -122,8 +124,9 @@ class BooksController < ApplicationController
                 @message="You don't own this boo so you can't change it."
             end
         else
-            @success=false
-            @message='You are not logged in. Please log in first.'
+          @success=false
+          @message='redirect'
+          @data=new_user_session_url
         end
         render json: {success: @success, message: @message, data: @data}, status: :ok    
     end
@@ -145,8 +148,9 @@ class BooksController < ApplicationController
                 @message="You don't own this boo so you can't delete it."
             end
         else
-            @success=false
-            @message='You are not logged in. Please log in first.'
+          @success=false
+          @message='redirect'
+          @data=new_user_session_url
         end
         render json: {success: @success, message: @message, data: @data}, status: :ok    
     end

@@ -18,4 +18,6 @@ module Bookamii
   end
 end
 
-#config.autoload_paths += ["#{config.root}/app/serializers"]
+Rails.application.configure do
+  #config.autoload_paths += ["#{config.root}/app/serializers"]
+end

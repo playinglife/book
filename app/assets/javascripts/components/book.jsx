@@ -5,6 +5,7 @@ class NewBook extends React.Component{
         super(props);
         this.rootRef = React.createRef();
         this.fileInput = React.createRef();
+        this.saveButton = React.createRef();
         
         if (typeof this.props.data.id!='undefined'){
             this.newBook=false;
@@ -72,6 +73,7 @@ class NewBook extends React.Component{
     }
 
     saveBook(){
+        $(this.saveButton.current).prop('disabled', true);
         if (!this.newBook){
             var url=APIUrls['Book']+'/'+this.props.data.id;
             var method='PUT';
@@ -115,18 +117,23 @@ class NewBook extends React.Component{
                     this.props.data.description=data.description;
                 }
             }else{
-              if (response.message.constructor===Array){
-                var mess='';
-                $(response.message).each(function(ind,msg){
-                  if (mess!=''){ mess+='<br>'; }
-                  mess+=msg;
-                });
-                global.app.notify('danger','',mess);
+              if (response.message=='redirect'){
+                window.location.replace(response.data);
               }else{
-                global.app.notify('danger','',response.message);
+                if (response.message.constructor===Array){
+                  var mess='';
+                  $(response.message).each(function(ind,msg){
+                    if (mess!=''){ mess+='<br>'; }
+                    mess+=msg;
+                  });
+                  global.app.notify('danger','',mess);
+                }else{
+                  global.app.notify('danger','',response.message);
+                }
               }
             }
-          }).catch(error => { global.loader.hideLoader(); global.app.notify('danger','',error); });
+            $(this.saveButton.current).prop('disabled', false);
+          }).catch(error => { global.loader.hideLoader(); global.app.notify('danger','',error); $(this.saveButton.current).prop('disabled', false); });
 
     }
 
@@ -154,7 +161,7 @@ class NewBook extends React.Component{
                 </div>
                 <hr/>
                 <div className="actions">
-                    <input value="Save" className="btn btn-primary" type="button" onClick={ this.saveBook.bind(this) }/>
+                    <input value="Save" className="btn btn-primary" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/>
                 </div>
             </form>
             </div>
@@ -253,15 +260,19 @@ class BookList extends React.Component {
         if (response.success==true){
             this.setState({books:response.data});
         }else{
-          if (response.message.constructor===Array){
-            var mess='';
-            $(response.message).each(function(ind,msg){
-              if (mess!=''){ mess+='<br>'; }
-              mess+=msg;
-            });
-            global.app.notify('danger','',mess);
+          if (response.message=='redirect'){
+            window.location.replace(response.data);
           }else{
-            global.app.notify('danger','',response.message);
+            if (response.message.constructor===Array){
+              var mess='';
+              $(response.message).each(function(ind,msg){
+                if (mess!=''){ mess+='<br>'; }
+                mess+=msg;
+              });
+              global.app.notify('danger','',mess);
+            }else{
+              global.app.notify('danger','',response.message);
+            }
           }
         }
     }).catch(error => {global.loader.hideLoader(); global.app.notify('danger','',error); });
@@ -305,15 +316,19 @@ class BookList extends React.Component {
             }
             global.app.notify('success','','Book deleted succesfully.');
         }else{
-          if (response.message.constructor===Array){
-            var mess='';
-            $(response.message).each(function(ind,msg){
-              if (mess!=''){ mess+='<br>'; }
-              mess+=msg;
-            });
-            global.app.notify('danger','',mess);
+          if (response.message=='redirect'){
+            window.location.replace(response.data);
           }else{
-            global.app.notify('danger','',response.message);
+            if (response.message.constructor===Array){
+              var mess='';
+              $(response.message).each(function(ind,msg){
+                if (mess!=''){ mess+='<br>'; }
+                mess+=msg;
+              });
+              global.app.notify('danger','',mess);
+            }else{
+              global.app.notify('danger','',response.message);
+            }
           }
         }
     }).catch(error => { global.loader.hideLoader(); global.app.notify('danger','',error); });

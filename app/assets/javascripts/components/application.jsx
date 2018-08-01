@@ -93,7 +93,7 @@ class Application extends React.Component {
 
   cancelOnDrop(event){
     event.preventDefault();
-    e.stopPropagation();
+    event.stopPropagation();
   }
 
   render() {
