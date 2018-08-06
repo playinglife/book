@@ -96,45 +96,27 @@ class NewBook extends React.Component{
             data.append('file', this.file);
           }
         }
-        global.loader.showLoader();
         
-        fetch(url, {
-          cache: 'reload',
-          method: method,
-          credentials: 'same-origin',
-          body: data,
-        }).then(response => response.json())
-          .then(response =>{
-            global.loader.hideLoader(); 
-            if (response.success==true){
-                global.app.notify('success','','Book succesfully updated');
-                if (this.newBook){
-                    root.find('#title').val('');
-                    root.find('#description').val('');
-                    this.resetFile();
-                }else{
-                    this.props.data.title=data.title;
-                    this.props.data.description=data.description;
-                }
+        var self=this;
+        global.fetch(url, method, data, {
+          callbackSuccess:function(){
+            global.app.notify('success','','Book succesfully updated');
+            if (self.newBook){
+                root.find('#title').val('');
+                root.find('#description').val('');
+                self.resetFile();
             }else{
-              if (response.message=='redirect'){
-                window.location.replace(response.data);
-              }else{
-                if (response.message.constructor===Array){
-                  var mess='';
-                  $(response.message).each(function(ind,msg){
-                    if (mess!=''){ mess+='<br>'; }
-                    mess+=msg;
-                  });
-                  global.app.notify('danger','',mess);
-                }else{
-                  global.app.notify('danger','',response.message);
-                }
-              }
+                self.props.data.title=data.title;
+                self.props.data.description=data.description;
             }
-            $(this.saveButton.current).prop('disabled', false);
-          }).catch(error => { global.loader.hideLoader(); global.app.notify('danger','',error); $(this.saveButton.current).prop('disabled', false); });
-
+          },
+          callbackFailure:function(){
+            $(self.saveButton.current).prop('disabled', false);
+          },
+          callbackError:function(){
+            $(self.saveButton.current).prop('disabled', false); 
+          }
+        });
     }
 
     render(){
@@ -203,11 +185,11 @@ class Book extends React.Component {
   render() {
     return (
         <div className="card" ref={ this.rootRef }>
-          <img className="card-img-top" src={ this.props.image+"?sync="+Date.now() } />
+          <div>
+            <img className="card-img-top" src={ this.props.image+"?sync="+Date.now() } />
+          </div>
           <div className="card-body">
           <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.title }>{ this.props.title }</div>
-          <hr/>
-          <div className="card-text">{ this.props.description }</div>
           </div>
           <div className="btn-group card-action d-flex" role="group">
             <button type="button" className="btn btn-success w-30" onClick={ this.editBook.bind(this) } >
@@ -224,6 +206,10 @@ class Book extends React.Component {
     )
   }
 }
+
+/*          <hr/>
+          <div className="card-text">{ this.props.description }</div>
+*/
 
 class BookList extends React.Component {
 
@@ -243,41 +229,22 @@ class BookList extends React.Component {
 
   /*Life cycle*/
   componentDidMount() {
+    var self=this;
     var data={};
-    global.loader.showLoader();
-    fetch(APIUrls['Book'], {
-      cache: 'reload',
-      method: 'GET',
-      credentials: 'same-origin',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+    
+    global.fetch(APIUrls['Book'], 'GET', null, {
+      callbackSuccess:function(response){
+        self.setState({books:response.data});
+      },
+      callbackFailure:function(){
+        $(self.saveButton.current).prop('disabled', false);
+      },
+      callbackError:function(){
+        $(self.saveButton.current).prop('disabled', false); 
       }
-      //body: JSON.stringify(data)
-    }).then(response => response.json())
-      .then(response=>{
-        global.loader.hideLoader(); 
-        if (response.success==true){
-            this.setState({books:response.data});
-        }else{
-          if (response.message=='redirect'){
-            window.location.replace(response.data);
-          }else{
-            if (response.message.constructor===Array){
-              var mess='';
-              $(response.message).each(function(ind,msg){
-                if (mess!=''){ mess+='<br>'; }
-                mess+=msg;
-              });
-              global.app.notify('danger','',mess);
-            }else{
-              global.app.notify('danger','',response.message);
-            }
-          }
-        }
-    }).catch(error => {global.loader.hideLoader(); global.app.notify('danger','',error); });
+    });    
   }
-
+  
   /*componentWillReceiveProps(newProps){
       this.setState({books:newProps.data});
   }*/
@@ -293,45 +260,27 @@ class BookList extends React.Component {
 
   /*Methods*/
   deleteBook(bookId){
+    var self=this;
     var data={};
-    global.loader.showLoader();
-    fetch(APIUrls['Book']+'/'+bookId, {
-      cache: 'reload',
-      method: 'DELETE',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      }
-      //body: JSON.stringify(data)
-    }).then(response => response.json())
-      .then(response=>{
-        global.loader.hideLoader(); 
-        if (response.success==true){
-            var index=null;
-            var newList=this.state.books.slice(0);
-            newList.some(function(item,ind){ if (item.id==bookId) { index=ind; return true; }else{ return false; } });
-            if (index!=null){
-                newList.splice(index,1);
-                this.setState({books:newList})
-            }
-            global.app.notify('success','','Book deleted succesfully.');
-        }else{
-          if (response.message=='redirect'){
-            window.location.replace(response.data);
-          }else{
-            if (response.message.constructor===Array){
-              var mess='';
-              $(response.message).each(function(ind,msg){
-                if (mess!=''){ mess+='<br>'; }
-                mess+=msg;
-              });
-              global.app.notify('danger','',mess);
-            }else{
-              global.app.notify('danger','',response.message);
-            }
-          }
+    
+    global.fetch(APIUrls['Book']+'/'+bookId, 'DELETE', null, {
+      callbackSuccess:function(){
+        var index=null;
+        var newList=self.state.books.slice(0);
+        newList.some(function(item,ind){ if (item.id==bookId) { index=ind; return true; }else{ return false; } });
+        if (index!=null){
+            newList.splice(index,1);
+            self.setState({books:newList})
         }
-    }).catch(error => { global.loader.hideLoader(); global.app.notify('danger','',error); });
+        global.app.notify('success','','Book deleted succesfully.');
+      },
+      callbackFailure:function(){
+        $(self.saveButton.current).prop('disabled', false);
+      },
+      callbackError:function(){
+        $(self.saveButton.current).prop('disabled', false); 
+      }
+    });    
   }
 
   editBook(bookData){

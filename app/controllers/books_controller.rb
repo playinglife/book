@@ -1,13 +1,13 @@
 class BooksController < ApplicationController
-  skip_before_action :verify_authenticity_token
-  #before_action :authenticate_user!
+  #skip_before_action :verify_authenticity_token
+  before_action :authenticate_user!
 
   def index
     @success=true;
     @data={}
     @message='';
 
-    if user_signed_in?
+    #if user_signed_in?
       @success=true;
       @message='';
 
@@ -21,11 +21,11 @@ class BooksController < ApplicationController
           image: book.image.url
         });
       }
-    else
-      @success=false
-      @message='redirect'
-      @data=new_user_session_url
-    end
+    #else
+    #  @success=false
+    #  @message='redirect'
+    #  @data=new_user_session_url
+    #end
     render json: {success: @success, message: @message, data: @data}, status: :ok
   end
 

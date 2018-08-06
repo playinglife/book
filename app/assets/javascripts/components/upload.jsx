@@ -107,7 +107,7 @@ class FilePreview extends React.Component {
     if (this.props.existing!=null){
       return(
         <div className="file-preview">
-          <img className="preview-img" src={ this.props.existing }/>
+          <img className="preview-img" src={ this.props.existing+"?sync="+Date.now() }/>
           <br/><br/>
           <button className="btn btn-primary" onClick={ this.props.handleFileRemove } name="Remove File">Remove</button>
         </div>

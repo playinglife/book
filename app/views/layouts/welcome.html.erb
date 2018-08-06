@@ -16,7 +16,8 @@
         noImage: image_path('noimage.png'),
         component: @component,
         data: @books,
-        signOutLink: destroy_session_path(@user)
+        loggedIn: @loggedIn
+        #signOutLink: destroy_session_path(@user)
     ) %>
 
     <%= yield %>

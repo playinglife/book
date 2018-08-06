@@ -192,10 +192,19 @@ body{
     margin:5px;
 }
 
-#books > .card > img{
+#books .card>div:first-child{
+  height:240px;
+  width:100%;
+}
+
+#books > .card div:first-child > img{
     padding:3px;
-    width:100%;
-    height: auto;
+    width:auto;
+    height:100%;
+    display: block;
+    margin: auto;
+    max-height: 100%;
+    max-width:100%;
 }
 
 #books .card .card-text{
@@ -381,6 +390,9 @@ body{
   margin: 2em 0;
   .preview-img{
     width:100%;
+  }
+  p{
+    word-break: break-all;
   }
 }
 
