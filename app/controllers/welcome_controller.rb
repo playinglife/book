@@ -15,5 +15,7 @@ class WelcomeController < ApplicationController
         #  });
         #}
         @loggedIn=user_signed_in?
+        @reset_password_token=params[:reset_password_token]?params[:reset_password_token]:nil
+        @unlock_token=params[:unlock_token]?params[:unlock_token]:nil
     end
 end

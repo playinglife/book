@@ -1,4 +1,4 @@
-APIUrls['Book']=window.location.href+'books';
+APIUrls['Book']=window.origin+'/books';
 
 class NewBook extends React.Component{
     constructor(props){
@@ -100,15 +100,17 @@ class NewBook extends React.Component{
         var self=this;
         global.fetch(url, method, data, {
           callbackSuccess:function(){
-            global.app.notify('success','','Book succesfully updated');
             if (self.newBook){
+                global.app.notify('success','','Book succesfully added');
                 root.find('#title').val('');
                 root.find('#description').val('');
                 self.resetFile();
             }else{
+                global.app.notify('success','','Book succesfully updated');
                 self.props.data.title=data.title;
                 self.props.data.description=data.description;
             }
+            $(self.saveButton.current).prop('disabled', false);
           },
           callbackFailure:function(){
             $(self.saveButton.current).prop('disabled', false);
@@ -143,7 +145,8 @@ class NewBook extends React.Component{
                 </div>
                 <hr/>
                 <div className="actions">
-                    <input value="Save" className="btn btn-primary" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/>
+                    <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
+                    <input value="Save" className="btn btn-primary pull-right" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/>
                 </div>
             </form>
             </div>
@@ -285,6 +288,10 @@ class BookList extends React.Component {
 
   editBook(bookData){
       this.props.changeComponent('NewBook',bookData);
+  }
+
+  cancelNewEdit(){
+    
   }
 
   render() {

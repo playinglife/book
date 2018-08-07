@@ -36,3 +36,4 @@ config/google_analytics.yml
 .DS_Store
 /nbproject/
 /.rspec-local
+/config/local_env.yml

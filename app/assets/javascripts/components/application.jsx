@@ -1,6 +1,10 @@
 var APIUrls={}
-APIUrls['Login']=window.location.href+'users/sign_in';
-APIUrls['Logout']=window.location.href+'users/sign_out';
+APIUrls['Login']=window.origin+'/users/sign_in';
+APIUrls['Signup']=window.origin+'/users';
+APIUrls['Forgot']=window.origin+'/users/password';
+APIUrls['Reset']=window.origin+'/users/password';
+APIUrls['Unlock']=window.origin+'/users/unlock';
+APIUrls['Logout']=window.origin+'/users/sign_out';
 
 var global={
     app: null   /*Will be set in application didMount event*/
@@ -17,11 +21,16 @@ class Application extends React.Component {
     this.state.component=this.props.component!==undefined?this.props.component:null;
     this.state.loggedIn=this.props.loggedIn;
     
+    this.unlockToken=this.props.unlock_token;
+    this.resetPasswordToken=this.props.reset_password_token;
+    
     this.firstRun=true;
         
     this.changeComponent.bind(this);
     this.loadComponent.bind(this);
     this.notify.bind(this);
+    this.login.bind(this);
+    this.cancel.bind(this);
     
     global.app=this;
     global.csrf=$('meta[name="csrf-token"]').attr('content');
@@ -95,14 +104,28 @@ class Application extends React.Component {
   }
 
   componentDidMount() {
+    this.unlockToken=null;
+    this.resetPasswordToken=null;
   }
   
   changeComponent(what,data,event){
-    this.setState({component: what,data: data});
+    if (this.state.component!=what){
+      if (this.lastComponent!=this.state.component){
+        this.lastComponent=this.state.component;
+      }
+      this.setState({component: what,data: data});
+    }
     if (event){
         event.preventDefault();
     }
   }    
+  
+  cancel(event){
+    this.setState({component: this.lastComponent});
+    if (event){
+        event.preventDefault();
+    }
+  }
   
   /*shouldComponentUpdate(nextProps, nextState){
       if (this.state.component!=nextState.component){
@@ -116,9 +139,9 @@ class Application extends React.Component {
   loadComponent(){
     var ComponentName=eval(this.state.component);
     if (this.firstRun){
-        return ( <ComponentName data={ this.state.data } changeComponent={ this.changeComponent.bind(this) } noImage={ this.props.noImage } /> );
+        return ( <ComponentName data={ this.state.data } cancel={ this.cancel.bind(this) } changeComponent={ this.changeComponent.bind(this) } noImage={ this.props.noImage } /> );
     }else{
-        return ( <ComponentName noImage={ this.props.noImage } /> );
+        return ( <ComponentName cancel={ this.cancel.bind(this) } noImage={ this.props.noImage } /> );
     }
   }
 
@@ -130,14 +153,14 @@ class Application extends React.Component {
             target: '_blank'
     },{
 	element: 'body',
-	position: null,
+	position: null ,
 	type: type,
 	allow_dismiss: true,
 	newest_on_top: false,
 	showProgressbar: false,
 	placement: {
-		from: "bottom",
-		align: "center"
+		from: "top",
+		align: "right"
 	},
 	offset: 20,
 	spacing: 1,
@@ -215,7 +238,7 @@ class Application extends React.Component {
     }else{
       return(
         <div>
-          <UserLogin onLogin={ this.login.bind(this) }/>
+          <Authorize unlockToken={ this.unlockToken } resetPasswordToken={ this.resetPasswordToken } onLogin={ this.login.bind(this) }/>
           <Loader />
           <div className=".notifications.top-right"></div>
           <ModalWin />
@@ -332,83 +355,4 @@ class ModalWin extends React.Component{
             return null
         }
     }
-}
-
-class UserLogin extends React.Component{
-   constructor(props){
-    super(props);
-    
-    this.state={
-      email: '',
-      password: '',
-      remember: 0
-    }
-  }
-
-  changeEmail(event){
-    this.setState({ email: event.target.value });
-  }
-  changePassword(event){
-    this.setState({ password: event.target.value });
-  }
-  changeRemember(event){
-    this.setState({ remember: event.target.value });
-  }
-      
-  login(){
-    var self=this;
-    var data={
-      user:{
-        email: this.state.email,
-        password: this.state.password,
-        remember_me: this.state.remember,
-      }
-    };
-    
-    global.fetch(APIUrls['Login'], 'POST', data, {
-      callbackSuccess:function(response){
-      },
-      callbackFailure:function(response){
-        if (response.error){
-          global.app.notify('danger','',response.error);
-        }else{
-          global.csrf=headers.get('Toki')
-          self.props.onLogin();
-        }
-      },
-      callbackError:function(){
-      }
-    });
-  }
-  
-  render(){
-    return(
-      <div id="center-devise">
-        <h2>Log in</h2>
-        <form className="new_user" acceptCharset="UTF-8">
-          <input name="utf8" value="✓" type="hidden" />
-          <div className="field">
-            <label htmlFor="user_email">Email</label><br/>
-            <input autoFocus="autofocus" autoComplete="email" className="form-control" value={ this.state.email } type="email" onChange={ this.changeEmail.bind(this) }/>
-          </div>
-          <div className="field">
-            <label htmlFor="user_password">Password</label><br/>
-            <input autoComplete="off" className="form-control" type="password" value={ this.state.password } onChange={ this.changePassword.bind(this) } />
-          </div>
-          <br/>
-          <div className="field form-group form-check">
-            <input className="form-check-input" value={ this.state.remember } type="checkbox" onChange={ this.changeRemember.bind(this) }/>
-            <label className="form-check-label" htmlFor="user_remember_me">Remember me</label>
-          </div>
-          <hr/>
-          <div className="actions">
-            <input value="Log in" className="btn btn-primary" type="button" onClick={ this.login.bind(this) }/>
-          </div>
-        </form>
-        <a href="/users/sign_up">Sign up</a><br/>
-        <a href="/users/password/new">Forgot your password?</a><br/>
-        <a href="/users/unlock/new">Didn't receive unlock instructions?</a><br/>
-      </div>
-    )
-  }
 }
