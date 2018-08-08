@@ -31,6 +31,8 @@ class Application extends React.Component {
     this.notify.bind(this);
     this.login.bind(this);
     this.cancel.bind(this);
+
+    this.addNewBook=this.addNewBook.bind(this);
     
     global.app=this;
     global.csrf=$('meta[name="csrf-token"]').attr('content');
@@ -108,6 +110,10 @@ class Application extends React.Component {
     this.resetPasswordToken=null;
   }
   
+  addNewBook(){
+    this.changeComponent('NewBook', {});
+  }
+  
   changeComponent(what,data,event){
     if (this.state.component!=what){
       if (this.lastComponent!=this.state.component){
@@ -139,7 +145,7 @@ class Application extends React.Component {
   loadComponent(){
     var ComponentName=eval(this.state.component);
     if (this.firstRun){
-        return ( <ComponentName data={ this.state.data } cancel={ this.cancel.bind(this) } changeComponent={ this.changeComponent.bind(this) } noImage={ this.props.noImage } /> );
+        return ( <ComponentName data={ this.state.data } cancel={ this.cancel.bind(this) } changeComponent={ this.changeComponent.bind(this) } noImage={ this.props.noImage } addNewBook={ this.addNewBook }/> );
     }else{
         return ( <ComponentName cancel={ this.cancel.bind(this) } noImage={ this.props.noImage } /> );
     }
@@ -345,7 +351,7 @@ class ModalWin extends React.Component{
                           <p>{ this.state.content }</p>
                         </div>
                         <div className="modal-footer">
-                          <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={ this.hideModal.bind(this) }>Close</button>
+                          <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={ this.hideModal.bind(this) }>Close</button>
                         </div>
                       </div>
                     </div>

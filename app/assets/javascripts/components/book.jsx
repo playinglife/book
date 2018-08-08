@@ -223,7 +223,7 @@ class BookList extends React.Component {
         this.state={'books':this.props.data};
         this.state={'books':[]}   //!!!!!!!!!!!!!!!!
     }else{
-        this.state={'books':[]}
+        this.state={'books':null}
     }
     this.getListBookUrl=APIUrls['GetListBook'];
     this.deleteBookUrl=APIUrls['DeleteBook'];
@@ -241,9 +241,11 @@ class BookList extends React.Component {
       },
       callbackFailure:function(){
         $(self.saveButton.current).prop('disabled', false);
+        self.setState({books:null});
       },
       callbackError:function(){
         $(self.saveButton.current).prop('disabled', false); 
+        self.setState({books:null});
       }
     });    
   }
@@ -253,7 +255,7 @@ class BookList extends React.Component {
   }*/
 
   shouldComponentUpdate(nextProps, nextState){
-      if (!global.helpers.isEqual(this.state.books.length,nextProps.data)){
+      if ( (this.state.books==null) || (!global.helpers.isEqual(this.state.books.length,nextProps.data)) ){
           return true
       }else{
           return false;
@@ -295,10 +297,34 @@ class BookList extends React.Component {
   }
 
   render() {
-      return (
-        <div id='books'>
-            { this.state.books.map(function(book, index){ return <Book key={ index } id={ book.id } title={book.title} image={book.image} description={book.description} noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook.bind(this) } />}.bind(this)) }
-        </div>
-    )
+    if (this.state.books!=null){
+      if (this.state.books.length>0){
+        return (
+          <div id='books'>
+              { this.state.books.map(function(book, index){ return <Book key={ index } id={ book.id } title={book.title} image={book.image} description={book.description} noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook.bind(this) } />}.bind(this)) }
+          </div>
+        )
+      }else{
+        return (
+          <div id='books'>
+            <div className='no-books'>
+              <div>
+                <div>
+                You have no books in your list<br />
+                Add a book now<br /><br />
+                </div>
+                <div>
+                <button className="btn btn-primary" onClick={ this.props.addNewBook } >
+                  <i className="fa fa-plus add-new-book-button"></i>
+                </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    }else{
+      return( <div></div> )
+    }
   }
 }

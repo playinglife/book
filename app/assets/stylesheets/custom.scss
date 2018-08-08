@@ -335,18 +335,30 @@ body{
     display: block;
     z-index:998;
     .close {display: none;}
-    .modal-title{
-      font-size:16px;
-      word-break: break-all;
-      overflow:hidden;
-    }
-    .modal-body{
-      font-size:13px;
-      word-break: break-all;
-      overflow:hidden;
-    }
-    p{
-      white-space: pre-wrap;
+    border: 1px solid #fff;
+    
+    .modal-content{
+      background-color: rgba(255,255,255,0.7);
+      border-color: #fff;
+      .modal-title{
+        font-size:16px;
+        word-break: break-all;
+        overflow:hidden;
+      }
+      .modal-header{
+        border-bottom: 1px solid #fff;
+      }
+      .modal-body{
+        font-size:13px;
+        word-break: break-all;
+        overflow:hidden;
+      }
+      .modal-footer{
+        border-top: 1px solid #fff;
+      }
+      p{
+        white-space: pre-wrap;
+      }
     }
 }
 
@@ -425,3 +437,29 @@ body{
 }
 
 
+/*When we have no books*/
+.no-books{
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;   
+  font-size:16px;
+  >div{
+    padding: 20px;
+    background-color: rgba(255,255,255,0.7);
+    border: 1px solid #fff;
+    border-radius: 5px;  
+  }
+  button{
+    padding: 5px 9px 2px 9px;
+    i{
+      font-size:35px;
+      color: #fff;
+    }
+  }
+}

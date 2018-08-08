@@ -1,15 +1,17 @@
 require 'rails_helper'
 
 describe Book do
+
   let (:book) do
-		@book=Book.first
+		build(:book)
 	end
 
   it "is not valid without a title" do
-    expect(@book).not_to be_valid
+    expect(book).not_to be_valid
   end
 
-  it "is valid object" do
+  it "is valid with title" do
+    @book=build(:book_ok)
     expect(@book).to be_valid
   end
 

@@ -1,9 +1,32 @@
+# == Schema Information
+#
+# Table name: books
+#
+#  id          :bigint(8)        not null, primary key
+#  title       :string(255)
+#  description :text(65535)
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  user_id     :integer
+#  image       :string(255)
+#
+
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  title: MyString
-  description: MyText
+book_1:
+  id: 1
+  title: Title for book 1
+  description: Description for book 1
+  user: user_1
 
-two:
-  title: MyString
-  description: MyText
+book_2:
+  id: 2
+  title: Title for book 2
+  description: Description for book 2
+  user: user_1
+
+book_3:
+  id: 3
+  title: Title for book 3
+  description: Description for book 3
+  user: user_2
