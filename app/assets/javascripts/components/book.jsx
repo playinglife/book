@@ -219,9 +219,10 @@ class BookList extends React.Component {
   /*Constructor*/
   constructor(props){
     super(props);
+
     if (this.props.data){
         this.state={'books':this.props.data};
-        this.state={'books':[]}   //!!!!!!!!!!!!!!!!
+        this.state={'books':null}   //The list of books is empty and will be populated through a GET request
     }else{
         this.state={'books':null}
     }
