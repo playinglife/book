@@ -12,7 +12,27 @@ var global={
 
 //const authenticityToken={ authenticityToken };
 
+/*type ApplicationProps={
+  component:            string,
+  data:                 Array,
+  user:                 Object,
+  loggedIn:             boolean,
+  reset_password_token: string,
+  unlock_token:         string
+  //attr? - optional. Others need to be provided.
+}*/
+
 class Application extends React.Component {
+  
+/*  static defaultProps(){
+    return{
+      user: null,
+      loggedIn: false,
+      reset_password_token: null,
+      unlock_token:         null
+    }
+  }*/
+  
   /*Constructor*/
   constructor(props){
     super(props);
@@ -41,7 +61,7 @@ class Application extends React.Component {
   componentWillMount(){
     global.fetch=function(url, method, data, callbacks){
       global.loader.showLoader();
-      headers={};
+      var headers;
 
       var options={
           cache: 'reload',
@@ -68,7 +88,7 @@ class Application extends React.Component {
       .then(response =>{
         global.loader.hideLoader();
         if (response && response.success==true){
-          if (typeof callbacks.callbackSuccess=='function') { callbacks.callbackSuccess(response); } 
+          if (typeof callbacks.callbackSuccess=='function') { callbacks.callbackSuccess(response, headers); } 
         }else{
           if (response && response.message=='redirect'){
             window.location.replace(response.data);
@@ -85,14 +105,14 @@ class Application extends React.Component {
                 global.app.notify('danger','',response.message);
               }
             }
-            if (typeof callbacks.callbackFailure=='function') { callbacks.callbackFailure(response); } 
+            if (typeof callbacks.callbackFailure=='function') { callbacks.callbackFailure(response, headers); } 
           }
         }
       })
-      .catch(error => { 
+      .catch(error => {
         global.loader.hideLoader(); 
         if (typeof callbacks.callbackError=='function') { 
-          callbacks.callbackError(error); 
+          callbacks.callbackError(error, headers); 
         }else{
           global.app.notify('danger','',error); 
         }
@@ -201,11 +221,11 @@ class Application extends React.Component {
     event.preventDefault();
     global.fetch(APIUrls['Logout'], 'DELETE', null, {
       callbackSuccess:function(response){},
-      callbackFailure:function(response){
+      callbackFailure:function(response, headers){
         global.csrf=headers.get('Toki')
         self.setState({loggedIn: false});
       },
-      callbackError:function(){
+      callbackError:function(error, headers){
         global.csrf=headers.get('Toki')
         self.setState({loggedIn: false});
       }

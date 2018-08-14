@@ -66,7 +66,7 @@ class Login extends React.Component{
     global.fetch(APIUrls['Login'], 'POST', data, {
       callbackSuccess:function(response){
       },
-      callbackFailure:function(response){
+      callbackFailure:function(response, headers){
         if (response.error){
           global.app.notify('danger','',response.error);
         }else{

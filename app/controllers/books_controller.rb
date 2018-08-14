@@ -14,11 +14,24 @@ class BooksController < ApplicationController
       @user=current_user
       @data=[];
       @user.books.each{ |book| 
+        if !book.images.empty? then
+          cover=book.images.find { |b| b.cover==true }
+          if cover 
+            cover=cover.id
+          else
+            cover=nil
+          end
+        else
+          cover=nil
+        end
+
         @data.push({
           id: book.id,
           title:book.title,
           description: book.description,
-          image: book.image.url
+          images: book.images,
+          quantity: book.quantity,
+          cover: cover
         });
       }
     #else
@@ -39,46 +52,14 @@ class BooksController < ApplicationController
     @message='';
 
     if user_signed_in?
-        @book=Book.new;
-        @book.title=params[:title];
-        @book.description=params[:description];
-        @book.image=params[:file];
-        @book.user=current_user;
+        book=Book.new;
+        book.title='';
+        book.description='';
+        book.user=current_user;
 
-        if @book.title.length==0
-            @success=false
-            @message='Please enter a title'
-        end
-
-        if (@success && @book.description.length==0)
-            @success=false
-            @message='Please enter a description'
-        end
-
-        if (@success && !@book.valid?)
-            @success=false;
-            @message='Invalid data';
-        end
-
-        @book.valid?
-        if (@book.errors.messages.length>0)
-          @success=false;
-          @message=Array.new;
-
-          @book.errors.messages.each do |key,attrMessage|
-            attrMessage.each do |errMessage|
-              @message.push errMessage
-            end
-          end
-          
-          if @message.length==1
-            @message=@message[0]
-          end
-        end
-        
         if (@success)
-          if @book.save()
-            @message=@message+@book.image.to_json
+          if book.save!(:validate => false)
+            @data=book
           else
             @success=false
             @message='Could not save data'
@@ -92,6 +73,8 @@ class BooksController < ApplicationController
       render json: {success: @success, message: @message, data: @data}, status: :ok
   end
 
+
+
     def update
         @success=true;
         @data={}
@@ -102,26 +85,89 @@ class BooksController < ApplicationController
             @message=''
 
             book=Book.find(params[:id])
-            if book.user==current_user
-                book.title=params[:title];
+            if book.user!=current_user
+              @success=false
+              @message="You don't own this book so you can't change it."
+            end
+
+            if (@success)
+              if (params[:title])
+                existing=current_user.books.find_by_title(params[:title])
+                if existing && existing.id!=params[:id].to_i
+                  @success=false
+                  @message="There is already a book with the same title."
+                else
+                  book.title=params[:title];
+                end
+              end
+              if (params[:description])
                 book.description=params[:description];
-                if params[:file]!="."
-                  if params[:file]=="null"
-                    book.remove_image!;
-                  else
-                     if !book.image.file.nil?
-                      book.remove_image!;
+              end
+              if (params[:quantity])
+                book.quantity=params[:quantity];
+              end
+              if (params[:file])
+                image=Image.new
+                image.name=params[:file]
+                book.images.push(image);
+              end
+              if (params[:cover])
+                cover=Image.find(params[:cover])
+                if (cover.book.user==current_user)
+
+                  book.images.each { |item|
+                    if item.cover
+                      item.cover=false
+                      item.save
                     end
-                    book.image=params[:file];
+                  }
+
+                  cover.cover=true
+                  cover.save
+                else
+                  @success=false
+                  @success=false
+                  @message="You don't own this book so you can't change it."
+                end
+              end
+            end
+
+            if (@success)
+              if (!params[:file])   #Only check validation errors if book is saved and not just an image upload for the book
+                book.valid?
+                if (book.errors.messages.length>0)
+                  @success=false;
+                  @message=Array.new;
+
+                  book.errors.messages.each do |key,attrMessage|
+                    attrMessage.each do |errMessage|
+                      @message.push errMessage
+                    end
+                  end
+
+                  if @message.length==1
+                    @message=@message[0]
                   end
                 end
-                if (!book.save())
-                    @success=false
-                    @message='Could not save data'
+              end
+
+              if @success
+                if (params[:file])
+                  saved=book.save!(:validate => false)
+                else
+                  saved=book.save()
                 end
-            else
-                @success=false
-                @message="You don't own this boo so you can't change it."
+
+                if saved
+                  if (params[:file]) 
+                    @data['newImage']=image
+                  end
+                else
+                  @success=false
+                  @message='Could not save data'
+                end
+              end
+
             end
         else
           @success=false
@@ -155,7 +201,32 @@ class BooksController < ApplicationController
         render json: {success: @success, message: @message, data: @data}, status: :ok    
     end
 
+    def destroyImage
+        @success=true;
+        @data={}
+        @message='';
+
+        if user_signed_in?
+            @success=true;
+            @message='';
+
+            image=Image.find(params[:id])
+
+            if image.book.user==current_user
+              image.delete
+            else
+              @success=false
+              @message="You don't own this book so you can't delete images for it."
+            end
+        else
+          @success=false
+          @message='redirect'
+          @data=new_user_session_url
+        end
+        render json: {success: @success, message: @message, data: @data}, status: :ok    
+    end
+
     def book_params
-      params.require(:book).permit(:title, :description, :image, :image_cache, :remove_image)
+      params.require(:book).permit(:title, :description, :image, :quantity, :image_cache, :remove_image)
     end
 end

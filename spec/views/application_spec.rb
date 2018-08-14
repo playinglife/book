@@ -1,11 +1,10 @@
 require 'rails_helper'
 
-describe 'application.html.erb' do
+describe 'layouts/welcome.html.erb' do
 
-    it "displays the left hand menu" do
-      assign(:books)
-      expect(response).to render_template :index
-      expect(response).to render_template :welcome
+    it "displays the render for Application React Component" do
+      render 
+      expect(rendered).to have_selector("div[data-react-class='Application']")
     end
   
 end

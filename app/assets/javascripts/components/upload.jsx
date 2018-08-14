@@ -109,7 +109,7 @@ class FilePreview extends React.Component {
         <div className="file-preview">
           <img className="preview-img" src={ this.props.existing+"?sync="+Date.now() }/>
           <br/><br/>
-          <button className="btn btn-primary" onClick={ this.props.handleFileRemove } name="Remove File">Remove</button>
+          { this.props.onlyView!=true ? <button className="btn btn-primary" onClick={ this.props.handleFileRemove } name="Remove File">Remove</button> : '' }
         </div>
       )
     }else{
@@ -125,3 +125,93 @@ class FilePreview extends React.Component {
   }
 }
 /*{ this.props.type.indexOf("image") != -1 ? <p className="preview-name">{ this.props.name }</p> : null }*/
+
+
+
+class ImageGallery extends React.Component {
+  constructor(props){
+    super(props);
+    
+    this.deleteImage=this.deleteImage.bind(this);
+    this.setToCover=this.setToCover.bind(this);
+  } 
+  
+  componentWillReceiveProps(someProps) {
+    
+  }
+  
+  componentDidMount(){
+  }
+  componentWillUnmount(){
+  }
+  
+  deleteImage(id){
+    this.props.deleteImage(id);
+  }
+
+  setToCover(id){
+    //this.setState({cover: id});
+    this.props.setToCover(id);
+  }
+  
+  render(){
+    if (this.props.images.length>0){
+      return(
+          <div>
+              { this.props.images.map(
+                function(image, index){ 
+                  return <Image key={ image.id } id={ image.id } url={image.name.url} cover={ image.id==this.props.cover } noImage={this.props.noImage} setToCover={ this.setToCover } deleteImage={ this.deleteImage } />
+                }.bind(this))
+              }
+          </div>
+      )
+    }else{
+      return null;
+    }
+  }
+}
+
+class Image extends React.Component {
+  constructor(props){
+    super(props);
+    
+    this.rootRef = React.createRef();
+    
+    this.setToCover=this.setToCover.bind(this);
+    this.deleteImage=this.deleteImage.bind(this);
+  }  
+  
+  deleteImage(event){
+    event.preventDefault();
+    event.stopPropagation();
+    this.props.deleteImage(this.props.id);
+  }
+  
+  setToCover(){
+    if (this.props.cover==false){
+      this.props.setToCover(this.props.id);
+    }else{
+      this.props.setToCover(null);
+    }
+  }
+  
+  componentDidMount(){
+    $(this.rootRef.current).find('[data-toggle=confirmation]').confirmation({
+        rootSelector: '[data-toggle=confirmation]',
+        popout: true,
+        singleton: true
+    });
+    $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window' });    
+  }
+  
+  render(){
+    return(
+        <div  ref={ this.rootRef } className={ this.props.cover ? "thumbnail cover" : "thumbnail" } onClick={ this.setToCover } >
+          <img src={this.props.url} />
+          <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteImage } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
+            <i className="fa fa-remove"></i>
+          </button>
+        </div>
+    )
+  }
+}

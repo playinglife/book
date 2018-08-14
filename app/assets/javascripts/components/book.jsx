@@ -1,4 +1,5 @@
 APIUrls['Book']=window.origin+'/books';
+APIUrls['DeleteImage']=window.origin+'/books/destroyImage';
 
 class NewBook extends React.Component{
     constructor(props){
@@ -6,17 +7,36 @@ class NewBook extends React.Component{
         this.rootRef = React.createRef();
         this.fileInput = React.createRef();
         this.saveButton = React.createRef();
-        
-        if (typeof this.props.data.id!='undefined'){
+
+        if (this.props.data.book && typeof this.props.data.book.id!='undefined'){
             this.newBook=false;
-            this.state={previewing: true, reset: true};
-            this.existingImage=this.props.data.image;
+            this.state={
+              book: this.props.data.book,
+              images: this.props.data.book.images,
+              cover: this.props.data.book.cover
+            };
         }else{
             this.newBook=true;
-            this.state={previewing: false, reset: false};
-            this.existingImage=null;
+            this.state={
+              book: null,
+              images: [],
+              cover: null
+            };
         }
+        
+        this.getCoverUrl=this.getCoverUrl.bind(this);
+        this.setToCover=this.setToCover.bind(this);
+        this.deleteImage=this.deleteImage.bind(this);
     }
+
+    getCoverUrl(coverId){
+      var img=this.state.images.find(function(img){ return img.id==coverId});
+      if (typeof img=='undefined'){
+        return this.props.noImage;
+      }else{
+        return img.name.url;
+      }
+    }  
 
     /*shouldComponentUpdate(nextProps){
         if (this.props.data.id!=nextProps.data.id || this.props.data.title!=nextProps.data.title || this.props.data.description!=nextProps.data.description ){
@@ -27,7 +47,7 @@ class NewBook extends React.Component{
     }*/
 
     componentWillReceiveProps(someProps) {
-        if (typeof someProps.data.id!='undefined'){
+        if (typeof someProps.data.book.id!='undefined'){
             this.newBook=false;
         }else{
             this.newBook=true;
@@ -37,6 +57,52 @@ class NewBook extends React.Component{
     }    
 
     componentDidMount(){
+      var self=this;
+      if (this.newBook){
+        $(this.saveButton.current).prop('disabled', true);
+        var self=this;
+        global.fetch(APIUrls['Book'], 'POST', {}, {
+          callbackSuccess:function(response){
+            self.newBook=false;
+            self.setState({book: response.data, images: [], cover: null});
+          },
+          callbackFailure:function(){
+
+          },
+          callbackError:function(){
+
+          }
+        });
+      }
+    }
+
+    setToCover(id){
+      this.setState({cover: id});
+    }
+
+    deleteImage(id){
+      var self=this;
+
+      global.fetch(APIUrls['DeleteImage']+'/'+id, 'DELETE', null, {
+        callbackSuccess:function(){
+          var index=null;
+          var newList=self.state.images.slice(0);
+          newList.some(function(item,ind){ if (item.id==id) { index=ind; return true; }else{ return false; } });
+          if (self.state.cover==id){
+            self.setToCover(null);
+          }
+
+          if (index!=null){
+              global.app.notify('success','','Image deleted succesfully.');
+              newList.splice(index,1);
+              self.setState({images:newList})
+          }
+        },
+        callbackFailure:function(){
+        },
+        callbackError:function(){
+        }
+      });          
     }
 
     handleFile(fileObj){
@@ -47,69 +113,51 @@ class NewBook extends React.Component{
 
       reader.onload = function(e) {
         this.file = reader.result;
-        this.setState({
-          previewing: true
+        
+        var root=$(this.rootRef.current);
+        let data = new FormData()
+        data.append('file', this.file);
+
+        var self=this;
+        global.fetch(APIUrls['Book']+'/'+this.state.book.id, 'PUT', data, {
+          callbackSuccess:function(response){
+            
+            var newList=self.state.images;
+            newList.push(response.data.newImage);
+            global.app.notify('success','','Image succesfully added');
+            self.setState({images: newList})
+          },
+          callbackFailure:function(){},
+          callbackError:function(){}
         });
+        
       }.bind(this);
       reader.readAsDataURL(fileObj.file);
-
-      this.setState({
-        reset: true
-      });
-    }
-
-    resetFile(){
-      this.existingImage=null;
-      this.setState({
-        previewing: false,
-        reset: true
-      });
-
-      setTimeout(function(){
-        this.setState({
-          reset: false
-        });
-      }.bind(this), 100);
     }
 
     saveBook(){
         $(this.saveButton.current).prop('disabled', true);
-        if (!this.newBook){
-            var url=APIUrls['Book']+'/'+this.props.data.id;
-            var method='PUT';
-        }else{
-            var url=APIUrls['Book'];
-            var method='POST';
-        }
+        var url=APIUrls['Book']+'/'+this.state.book.id;
+        var method='PUT';
         
         var root=$(this.rootRef.current);
         
         let data = new FormData()
         data.append('title', root.find('#title').val());
         data.append('description', root.find('#description').val());
-        if (this.existingImage!=null){
-          data.append('file', '.'); //"." means don't update image because it's the same as the current one in the db
-        }else{
-          if (this.state.previewing==false){
-            data.append('file', null);
-          }else{
-            data.append('file', this.file);
-          }
+        data.append('quantity', root.find('#quantity').val());
+        if (this.state.cover!=null){
+          data.append('cover', this.state.cover);
         }
         
         var self=this;
         global.fetch(url, method, data, {
           callbackSuccess:function(){
-            if (self.newBook){
-                global.app.notify('success','','Book succesfully added');
-                root.find('#title').val('');
-                root.find('#description').val('');
-                self.resetFile();
-            }else{
-                global.app.notify('success','','Book succesfully updated');
-                self.props.data.title=data.title;
-                self.props.data.description=data.description;
-            }
+            global.app.notify('success','','Book succesfully updated');
+            var obj=self.state.book;
+            obj.title=data.title;
+            obj.description=data.description;
+            self.setState({book: obj});
             $(self.saveButton.current).prop('disabled', false);
           },
           callbackFailure:function(){
@@ -120,45 +168,70 @@ class NewBook extends React.Component{
           }
         });
     }
-
+    
     render(){
         return(
-            <div className="center-form" ref={ this.rootRef }>
-            <h2>{ !this.newBook ? "Edit book" : "Add new book" }</h2>
+          <div className="center-panel">
+            <div className="panel" ref={ this.rootRef }>
+            <h3>Edit book</h3>
             <form>
                 <div className="field">
                   <div className="uploader" >
-                    { !this.state.reset ? <FileInput onFileChange={ this.handleFile.bind(this) }></FileInput> : null }
-                    { this.state.previewing ? <FilePreview existing={ this.existingImage } file={ this.file } name={ this.fileName } type={ this.fileType } handleFileRemove={ this.resetFile.bind(this) }></FilePreview> : null }
+                    <FilePreview existing={ this.getCoverUrl(this.state.cover) } onlyView={ true } ></FilePreview>
                   </div>
                 </div>
 
                 <div className="field">
-                    <label htmlFor="title">Title</label><br/>
-                    <input className="form-control" id="title" type="text" maxLength="100" defaultValue={ !this.newBook ? this.props.data.title : "" } />
+                    <label>Title</label><br/>
+                    <input className="form-control" id="title" type="text" maxLength="100" defaultValue={ !this.newBook ? this.state.book.title : "" } />
                 </div>
 
                 <div className="field">
-                    <label htmlFor="user_email">Description</label><br/>
-                    <textarea className="form-control" id="description" defaultValue={ !this.newBook ? this.props.data.description : "" } maxLength="1000">
+                    <label>Description</label><br/>
+                    <textarea className="form-control" id="description" defaultValue={ !this.newBook ? this.state.book.description : "" } maxLength="1000">
                     </textarea>
+                </div>
+                <div className="field">
+                    <label>Quantity</label><br/>
+                    <input className="form-control" id="quantity" defaultValue={ !this.newBook ? this.state.book.quantity : "" } />
                 </div>
                 <hr/>
                 <div className="actions">
-                    <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
-                    <input value="Save" className="btn btn-primary pull-right" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/>
+                    <input value="Back" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
+                    { !this.newBook ? <input value="Save" className="btn btn-primary pull-right" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/> : '' }
                 </div>
             </form>
             </div>
+            
+            <div className="panel">
+              <h3>Add an image </h3>
+              { !this.newBook ?
+                <form>
+                  <div className="field">
+                    <div className="uploader" >
+                      <FileInput onFileChange={ this.handleFile.bind(this) }></FileInput>
+                    </div>
+                  </div>
+                  <h3>Select cover image</h3>
+                  <div className="field">
+                    <ImageGallery images={ this.state.images } cover={ !this.newBook ? this.state.cover : null } setToCover={ this.setToCover } deleteImage={ this.deleteImage } />
+                  </div>
+                </form>
+               : '' }
+            </div>
+          </div>
         );
     }    
 }
+
 
 
 class Book extends React.Component {
   constructor(props){
     super(props);
     this.rootRef = React.createRef();
+    
+    this.getCoverUrl=this.getCoverUrl.bind(this);        
   }
 
   componentDidMount(){
@@ -170,49 +243,49 @@ class Book extends React.Component {
     $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window' });
   }
     
+  getCoverUrl(){
+    var coverId=this.props.book.cover;
+    var img=this.props.book.images.find(function(img){ return img.id==coverId});
+    if (typeof img=='undefined'){
+      return this.props.noImage;
+    }else{
+      return img.name.url;
+    }
+  }  
+    
   deleteBook(event){
-      this.props.deleteBook(this.props.id);
-      event.preventDefault();
+    event.preventDefault();
+    event.stopPropagation();
+      this.props.deleteBook(this.props.book.id);
   }
 
-  detailsBook(event){
+  /*detailsBook(event){
+    
       global.modal.showModal(this.props.title,this.props.description);
       event.preventDefault();
-  }
+  }*/
   
   editBook(event){
-      this.props.editBook({id: this.props.id, title: this.props.title, description: this.props.description, image: this.props.image});
+      this.props.editBook({book: this.props.book} );
       event.preventDefault();
   }
 
   render() {
     return (
-        <div className="card" ref={ this.rootRef }>
+        <div className="card" ref={ this.rootRef } onClick={ this.editBook.bind(this) }>
           <div>
-            <img className="card-img-top" src={ this.props.image+"?sync="+Date.now() } />
+            <img className="card-img-top" src={ this.getCoverUrl()+"?sync="+Date.now() } />
           </div>
           <div className="card-body">
-          <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.title }>{ this.props.title }</div>
+          <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.book.title }>{ this.props.book.title }</div>
           </div>
-          <div className="btn-group card-action d-flex" role="group">
-            <button type="button" className="btn btn-success w-30" onClick={ this.editBook.bind(this) } >
-              <i className="fa fa-edit"></i>
-            </button>
-            <button type="button" className="btn btn-primary w-100" onClick={ this.detailsBook.bind(this) } >
-              Details
-            </button>
-            <button type="button" className="btn btn-danger w-30" onClick={ this.deleteBook.bind(this) } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
-              <i className="fa fa-remove"></i>
-            </button>
-          </div>
+          <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteBook.bind(this) } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
+            <i className="fa fa-remove"></i>
+          </button>
         </div>
     )
   }
 }
-
-/*          <hr/>
-          <div className="card-text">{ this.props.description }</div>
-*/
 
 class BookList extends React.Component {
 
@@ -302,7 +375,7 @@ class BookList extends React.Component {
       if (this.state.books.length>0){
         return (
           <div id='books'>
-              { this.state.books.map(function(book, index){ return <Book key={ index } id={ book.id } title={book.title} image={book.image} description={book.description} noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook.bind(this) } />}.bind(this)) }
+              { this.state.books.map(function(book, index){ return <Book key={ index } book={ book } noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook.bind(this) } />}.bind(this)) }
           </div>
         )
       }else{
