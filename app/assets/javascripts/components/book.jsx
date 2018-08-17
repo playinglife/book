@@ -1,5 +1,6 @@
 APIUrls['Book']=window.origin+'/books';
 APIUrls['DeleteImage']=window.origin+'/books/destroyImage';
+APIUrls['AuthorTypeahead']=window.origin+'/authors/typeahead';
 
 class NewBook extends React.Component{
     constructor(props){
@@ -23,6 +24,8 @@ class NewBook extends React.Component{
               cover: null
             };
         }
+        
+        this.newAuthor=false;
         
         this.getCoverUrl=this.getCoverUrl.bind(this);
         this.setToCover=this.setToCover.bind(this);
@@ -73,6 +76,42 @@ class NewBook extends React.Component{
 
           }
         });
+      }
+      
+      if (!this.newBook){
+        $(this.rootRef.current).find('#author').on('keydown',function(){
+          self.newAuthor=true;
+          $(self.rootRef.current).find('#authorBirthdayGroup').show();
+        });
+        
+        $(this.rootRef.current).find('#author').on('typeahead:selected', function(ev, suggestion) {
+          $(self.rootRef.current).find('#author_id').val(suggestion.id);
+          self.newAuthor=false;
+          $(self.rootRef.current).find('#authorBirthdayGroup').hide();
+        }).typeahead(
+          {},{
+            display: 'value',
+            source: function(query, result){
+              global.fetch(APIUrls['AuthorTypeahead']+'/'+query, 'GET', null, {
+                lock: false,
+                callbackSuccess:function(response){
+                  let list=[];
+                  list=$.map(response.data, function(item){
+                    item.value=item.firstname+' '+item.lastname;
+                    return item;
+                  })
+                  result(list);
+                },
+                callbackFailure:function(){
+                },
+                callbackError:function(){
+                }
+              });
+
+            }
+          });
+          
+        $(this.rootRef.current).find('#authorBirthday').datetimepicker();
       }
     }
 
@@ -145,6 +184,12 @@ class NewBook extends React.Component{
         let data = new FormData()
         data.append('title', root.find('#title').val());
         data.append('description', root.find('#description').val());
+        data.append('author', root.find('#author').val());
+        
+        //!!!
+        //data.append('birthday', root.find('#authorBirthday').val());
+        data.append('birthday', '10/10/1980');
+        
         data.append('quantity', root.find('#quantity').val());
         if (this.state.cover!=null){
           data.append('cover', this.state.cover);
@@ -172,7 +217,7 @@ class NewBook extends React.Component{
     render(){
         return(
           <div className="center-panel">
-            <div className="panel" ref={ this.rootRef }>
+            <div className="panel child-panel" ref={ this.rootRef }>
             <h3>Edit book</h3>
             <form>
                 <div className="field">
@@ -185,7 +230,24 @@ class NewBook extends React.Component{
                     <label>Title</label><br/>
                     <input className="form-control" id="title" type="text" maxLength="100" defaultValue={ !this.newBook ? this.state.book.title : "" } />
                 </div>
+                <div className="field">
+                    <label>Author</label><br/>
+                    <input id="author_id" type="hidden" />
+                    <input className="form-control typeahead" id="author" type="text" defaultValue={ !this.newBook ? this.state.book.author : "" }/>
+                </div>
 
+                <div className="field" id='authorBirthdayGroup'>
+                  <label>New author's birthday</label><br/>
+                        <div className="form-group">                  
+                          <div className='input-group date' id='authorBirthday'>
+                            <input type='text' className="form-control" />
+                            <span className="input-group-addon">
+                                <span className="glyphicon glyphicon-calendar"></span>
+                            </span>
+                          </div>
+                        </div>
+                </div>
+                  
                 <div className="field">
                     <label>Description</label><br/>
                     <textarea className="form-control" id="description" defaultValue={ !this.newBook ? this.state.book.description : "" } maxLength="1000">
@@ -203,7 +265,7 @@ class NewBook extends React.Component{
             </form>
             </div>
             
-            <div className="panel">
+            <div className="panel child-panel">
               <h3>Add an image </h3>
               { !this.newBook ?
                 <form>
@@ -231,6 +293,8 @@ class Book extends React.Component {
     super(props);
     this.rootRef = React.createRef();
     
+    this.filteredOut=false;
+    
     this.getCoverUrl=this.getCoverUrl.bind(this);        
   }
 
@@ -242,6 +306,20 @@ class Book extends React.Component {
     });
     $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window' });
   }
+    
+  componentWillReceiveProps(someProps) {
+      if (someProps.filter!=null && someProps.filter.trim!=''){
+        var regexp=new RegExp(someProps.filter, "i");
+        if (this.props.book.title.match(regexp) || this.props.book.description.match(regexp) || this.props.book.author.match(regexp)){
+          //LIKE someProps.filter || this.props.description LIKE someProps.filter || this.props.author LIKE someProps.filter ){
+          this.filteredOut=false;
+        }else{
+          this.filteredOut=true;
+        }
+      }else{
+        this.filteredOut=false;
+      }
+  }    
     
   getCoverUrl(){
     var coverId=this.props.book.cover;
@@ -271,19 +349,23 @@ class Book extends React.Component {
   }
 
   render() {
-    return (
-        <div className="card" ref={ this.rootRef } onClick={ this.editBook.bind(this) }>
-          <div>
-            <img className="card-img-top" src={ this.getCoverUrl()+"?sync="+Date.now() } />
+    if (this.filteredOut==false){
+      return (
+          <div className="panel card" ref={ this.rootRef } onClick={ this.editBook.bind(this) }>
+            <div>
+              <img className="card-img-top" src={ this.getCoverUrl()+"?sync="+Date.now() } />
+            </div>
+            <div className="card-body">
+            <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.book.title }>{ this.props.book.title }</div>
+            </div>
+            <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteBook.bind(this) } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
+              <i className="fa fa-remove"></i>
+            </button>
           </div>
-          <div className="card-body">
-          <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.book.title }>{ this.props.book.title }</div>
-          </div>
-          <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteBook.bind(this) } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
-            <i className="fa fa-remove"></i>
-          </button>
-        </div>
-    )
+      )
+    }else{
+      return null;
+    }
   }
 }
 
@@ -294,13 +376,28 @@ class BookList extends React.Component {
     super(props);
 
     if (this.props.data){
-        this.state={'books':this.props.data};
-        this.state={'books':null}   //The list of books is empty and will be populated through a GET request
+        this.state={
+          'books':this.props.data,
+          'filter': null, //null if there is no filer, query if there is a filter
+          'showFilter': false
+        };
+        this.state={
+          'books':null, //The list of books is empty and will be populated through a GET request
+          'filter': null, //null if there is no filer, query if there is a filter
+          'showFilter': false
+        }
     }else{
-        this.state={'books':null}
+        this.state={
+          'books':null,
+          'filter': null, //null if there is no filer, query if there is a filter
+          'showFilter': false
+        }
     }
     this.getListBookUrl=APIUrls['GetListBook'];
     this.deleteBookUrl=APIUrls['DeleteBook'];
+    
+    this.filter=this.filter.bind(this);
+    this.toggleFilter=this.toggleFilter.bind(this);
   }
 
 
@@ -370,12 +467,24 @@ class BookList extends React.Component {
     
   }
 
+  filter(query){
+    this.setState({filter: query});
+  }
+  toggleFilter(show){
+    if (show==true){
+      this.setState({showFilter: true});
+    }else{
+      this.setState({showFilter: false, filter: null});
+    }
+  }
+  
   render() {
     if (this.state.books!=null){
       if (this.state.books.length>0){
         return (
           <div id='books'>
-              { this.state.books.map(function(book, index){ return <Book key={ index } book={ book } noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook.bind(this) } />}.bind(this)) }
+            { this.state.books.map(function(book, index){ return <Book key={ index } book={ book } noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook.bind(this) } filter={ this.state.filter } />}.bind(this)) }
+            <Search filter={ this.state.filter } showFilter={ this.state.showFilter } onFilter={ this.filter } toggleFilter={ this.toggleFilter }/>
           </div>
         )
       }else{

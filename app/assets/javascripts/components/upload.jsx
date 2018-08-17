@@ -160,7 +160,7 @@ class ImageGallery extends React.Component {
           <div>
               { this.props.images.map(
                 function(image, index){ 
-                  return <Image key={ image.id } id={ image.id } url={image.name.url} cover={ image.id==this.props.cover } noImage={this.props.noImage} setToCover={ this.setToCover } deleteImage={ this.deleteImage } />
+                  return <Image key={ image.id } id={ image.id } url={image.name.thumb.url} cover={ image.id==this.props.cover } noImage={this.props.noImage} setToCover={ this.setToCover } deleteImage={ this.deleteImage } />
                 }.bind(this))
               }
           </div>

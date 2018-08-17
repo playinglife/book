@@ -1,11 +1,9 @@
 class BooksController < ApplicationController
   #skip_before_action :verify_authenticity_token
-  before_action :authenticate_user!
+  #before_action :authenticate_user!
 
   def index
-    @success=true;
     @data={}
-    @message='';
 
     #if user_signed_in?
       @success=true;
@@ -13,7 +11,8 @@ class BooksController < ApplicationController
 
       @user=current_user
       @data=[];
-      @user.books.each{ |book| 
+      @user.books.includes(:author).each{ |book| 
+
         if !book.images.empty? then
           cover=book.images.find { |b| b.cover==true }
           if cover 
@@ -29,6 +28,7 @@ class BooksController < ApplicationController
           id: book.id,
           title:book.title,
           description: book.description,
+          author: book.author.blank? ? nil : "#{book.author.firstname} #{book.author.lastname}",
           images: book.images,
           quantity: book.quantity,
           cover: cover
@@ -47,9 +47,7 @@ class BooksController < ApplicationController
   end
 
   def create
-    @success=true;
     @data={}
-    @message='';
 
     if user_signed_in?
         book=Book.new;
@@ -76,14 +74,9 @@ class BooksController < ApplicationController
 
 
     def update
-        @success=true;
         @data={}
-        @message='';
 
         if user_signed_in?
-            @success=true
-            @message=''
-
             book=Book.find(params[:id])
             if book.user!=current_user
               @success=false
@@ -102,6 +95,30 @@ class BooksController < ApplicationController
               end
               if (params[:description])
                 book.description=params[:description];
+              end
+              if (params[:author])
+                names=params[:author].split(" ")
+                lastname=names[names.length-1]
+                names.pop
+                firstname=names.join(" ")
+                #joined=params[:author].gsub(/\s+/, "")
+
+                author=Author.where("firstname=? AND lastname=?","#{firstname}","#{lastname}").first
+                #author=Author.where("CONCAT(firstname,lastname) = ?" , "#{joined}").first
+                if author.blank?
+                  author=Author.new({
+                    firstname: firstname,
+                    lastname: lastname,
+                    birthday: params[:birthday]
+                  })
+                  if author.valid?
+                    author.save
+                  else
+                    self.checkErrors(author)
+                  end
+                end
+                
+                book.author=author
               end
               if (params[:quantity])
                 book.quantity=params[:quantity];
@@ -178,9 +195,7 @@ class BooksController < ApplicationController
     end
 
     def destroy
-        @success=true;
         @data={}
-        @message='';
 
         if user_signed_in?
             @success=true;
@@ -202,9 +217,7 @@ class BooksController < ApplicationController
     end
 
     def destroyImage
-        @success=true;
         @data={}
-        @message='';
 
         if user_signed_in?
             @success=true;

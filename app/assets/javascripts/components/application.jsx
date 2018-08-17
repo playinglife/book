@@ -59,19 +59,25 @@ class Application extends React.Component {
   }
 
   componentWillMount(){
-    global.fetch=function(url, method, data, callbacks){
-      global.loader.showLoader();
+    global.fetch=function(url, method, data, passedSettings){
       var headers;
+      var settings={
+        lock: true
+      }
+      $.extend(settings, passedSettings);
 
       var options={
-          cache: 'reload',
-          method: method,
-          credentials: 'same-origin',
-          headers: {
-            'Accept': 'application/json',
-            'X-CSRF-Token': global.csrf
-          }
+        cache: 'reload',
+        method: method,
+        credentials: 'same-origin',
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-Token': global.csrf
         }
+      }
+
+      if (settings.lock){ global.loader.showLoader(); }
+
       if (data!=null){
         if (!(data!=null && (typeof data.append=='function'))){
           options.headers['Content-Type']='application/json';
@@ -86,9 +92,9 @@ class Application extends React.Component {
       fetch(url, options)
       .then(response => { headers=response.headers; return response.json(); })
       .then(response =>{
-        global.loader.hideLoader();
+        if (settings.lock){ global.loader.hideLoader(); }
         if (response && response.success==true){
-          if (typeof callbacks.callbackSuccess=='function') { callbacks.callbackSuccess(response, headers); } 
+          if (typeof settings.callbackSuccess=='function') { settings.callbackSuccess(response, headers); } 
         }else{
           if (response && response.message=='redirect'){
             window.location.replace(response.data);
@@ -105,14 +111,14 @@ class Application extends React.Component {
                 global.app.notify('danger','',response.message);
               }
             }
-            if (typeof callbacks.callbackFailure=='function') { callbacks.callbackFailure(response, headers); } 
+            if (typeof settings.callbackFailure=='function') { settings.callbackFailure(response, headers); } 
           }
         }
       })
       .catch(error => {
         global.loader.hideLoader(); 
-        if (typeof callbacks.callbackError=='function') { 
-          callbacks.callbackError(error, headers); 
+        if (typeof settings.callbackError=='function') { 
+          settings.callbackError(error, headers); 
         }else{
           global.app.notify('danger','',error); 
         }
@@ -246,6 +252,9 @@ class Application extends React.Component {
                     </li>
                     <li>
                         <a href='' onClick={ this.changeComponent.bind(this, 'BookList', {}) }>My Books</a>
+                    </li>
+                    <li>
+                        <a href='' onClick={ this.changeComponent.bind(this, 'Friends', {}) }>Friends</a>
                     </li>
                     <li>
                     <a rel="nofollow" href="" onClick={ this.logout.bind(this) }>Sign out</a>

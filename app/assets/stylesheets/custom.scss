@@ -2,7 +2,9 @@ $primary: rgb(192,135,62);
 $danger: rgb(90,39,8);
 $success: rgb(216,183,114);
 
-/*Bootstrap override*/
+/*===========================
+    Bootstrap override
+===========================*/
 .btn-primary, 
 .btn-primary:visited,
 .btn-primary:active:focus {
@@ -69,6 +71,12 @@ $success: rgb(216,183,114);
 .form-control:focus {
     border-color: $primary;
     box-shadow: 0 0 0 0.2rem lighten( $primary, 25% );
+}
+
+/*Label in forms*/
+label {
+    margin-bottom: 0;
+    margin-top: 0.5rem;
 }
 
 /*Fonts*/
@@ -161,7 +169,7 @@ body {
 }
 
 .sidebar-nav>.sidebar-brand a {
-  color: #999999;
+  //color: #999999;
 }
 
 .sidebar-nav>.sidebar-brand a:hover {
@@ -180,12 +188,17 @@ body{
     background-size: cover;
 }
 
+/*Panels css*/
+.panel{
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #fff;
+}
+
+
 #books{
     padding:20px;
 }
 #books .card{
-    background-color: rgba(255,255,255,0.7);
-    border: 1px solid #fff;
     width: 220px;
     height: 340px;
     float: left;
@@ -334,7 +347,7 @@ body{
       padding: 25px;
       border-spacing: 10px;      
     }
-    .panel{
+    .child-panel{
         background-color: rgba(255, 255, 255, 0.7);
         border: 1px solid #fff;
         padding: 10px;
@@ -512,4 +525,71 @@ body{
 
 .thumbnail.cover{
   border:1px solid $primary;
+}
+
+
+/*Twitter typeahead override*/
+.twitter-typeahead{
+  width: 100%;
+}
+
+/*Hide author birthday by default when opening the edit page*/
+#authorBirthdayGroup{
+  display: none;
+}
+
+.search-box{
+  position: fixed;
+  top:-1px;
+  right:18px;
+  width:500px;
+  height:60px;
+  padding:10px;
+  border-radius: 0 0 0 5px;
+  transition: top 0.5s ease-in-out;
+  i{
+    cursor: pointer;
+  }
+}
+
+.search-box-show{
+  width:60px;
+}
+
+.search-box-hidden{
+  top:-60px;
+  transition: top 0.5s ease-in-out;
+}
+
+.filtered{
+  position: fixed;
+  top:-1px;
+  right:50%;
+  margin-left: -30px;
+  width:60px;
+  height:60px;
+  padding:10px;
+  border-radius: 0 0 5px 5px;
+}
+
+.hidden{
+  display: none;
+}
+
+.user-alert {
+  animation:alert 10s;
+  -moz-animation:alert 10s infinite; /* Firefox */
+  -webkit-animation:alert 10s infinite; /* Safari and Chrome */
+}
+
+@-moz-keyframes alert /* Firefox */ {
+    0% {background:#e9ecef;color: #495057;}
+    50% {background:$primary;color: #fff;}
+    100% {background:#e9ecef;color: #495057;}
+}
+
+@-webkit-keyframes alert /* Safari and Chrome */ {
+    0% {background:#e9ecef;color: #495057;}
+    50% {background:$primary;color: #fff;}
+    100% {background:e9ecef;color: #495057;}
 }

@@ -24,7 +24,7 @@ class Book < ApplicationRecord
   validates_associated :user
   
   belongs_to  :user
-  belongs_to  :author, optional: true
+  belongs_to  :author
   has_many    :images, dependent:   :destroy
 
 end
