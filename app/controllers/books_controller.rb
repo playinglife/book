@@ -11,7 +11,10 @@ class BooksController < ApplicationController
 
       @user=current_user
       @data=[];
-      @user.books.includes(:author).each{ |book| 
+      #@user.books.includes(:author).includes(:loans).where('loan.loaner_id = ? AND loan.return_date IS NOT NULL AND loans.return_date<NOW',"#{@user.id}").
+      #count(:borrower_id).each{ |book| 
+
+      @user.books.left_joins(:author, :loans).where('(loans.lend_date IS NOT NULL AND loans.return_date IS NULL) OR (loans.lend_date IS NULL AND loans.return_date IS NULL)').group('books.id').each{ |book| 
 
         if !book.images.empty? then
           cover=book.images.find { |b| b.cover==true }
@@ -31,7 +34,8 @@ class BooksController < ApplicationController
           author: book.author.blank? ? nil : "#{book.author.firstname} #{book.author.lastname}",
           images: book.images,
           quantity: book.quantity,
-          cover: cover
+          cover: cover,
+          givenTaken: book.loans.count>0 ? true : false
         });
       }
     #else
@@ -238,6 +242,41 @@ class BooksController < ApplicationController
         end
         render json: {success: @success, message: @message, data: @data}, status: :ok    
     end
+
+#Other users books
+  def others
+    @data={}
+      @user=current_user
+      @data=[];
+
+      User.includes(:books, :books => [:author, :images]).where("id<>?",@user.id).all.each{ |user| 
+        if !user.books.empty? then
+          user.books.each{ |book| 
+            if !book.images.empty? then
+              cover=book.images.find { |b| b.cover==true }
+              if cover 
+                cover=cover.id
+              else
+                cover=nil
+              end
+            else
+              cover=nil
+            end
+
+            @data.push({
+              id: book.id,
+              title:book.title,
+              description: book.description,
+              author: book.author.blank? ? nil : "#{book.author.firstname} #{book.author.lastname}",
+              images: book.images,
+              quantity: book.quantity,
+              cover: cover
+            });
+          }
+        end
+      }
+    render json: {success: @success, message: @message, data: @data}, status: :ok
+  end
 
     def book_params
       params.require(:book).permit(:title, :description, :image, :quantity, :image_cache, :remove_image)

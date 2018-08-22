@@ -15,7 +15,7 @@
         logo: image_path('book.png'), 
         noImage: image_path('noimage.png'),
         component: @component,
-        data: @books,
+        data: {books: @books, mine: true},
         loggedIn: @loggedIn,
         reset_password_token: @reset_password_token,
         unlock_token: @unlock_token

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_15_141116) do
+ActiveRecord::Schema.define(version: 2018_08_21_180037) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "namespace"
@@ -59,6 +59,7 @@ ActiveRecord::Schema.define(version: 2018_08_15_141116) do
     t.integer "user_id"
     t.integer "quantity", default: 0
     t.integer "author_id"
+    t.integer "available", default: 0, null: false
     t.index ["author_id"], name: "index_author_id"
     t.index ["user_id"], name: "index_user_id"
   end
@@ -68,6 +69,18 @@ ActiveRecord::Schema.define(version: 2018_08_15_141116) do
     t.bigint "book_id"
     t.boolean "cover", default: false
     t.index ["book_id"], name: "index_images_on_book_id"
+  end
+
+  create_table "loans", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "book_id"
+    t.datetime "lend_date"
+    t.integer "days"
+    t.datetime "return_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["book_id"], name: "index_loans_on_book_id"
+    t.index ["user_id"], name: "index_loans_on_user_id"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

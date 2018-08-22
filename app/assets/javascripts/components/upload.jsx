@@ -146,12 +146,16 @@ class ImageGallery extends React.Component {
   }
   
   deleteImage(id){
-    this.props.deleteImage(id);
+    if (typeof this.props.deleteImage=='function'){
+      this.props.deleteImage(id);
+    }
   }
 
   setToCover(id){
     //this.setState({cover: id});
-    this.props.setToCover(id);
+    if (typeof this.props.setToCover=='function'){
+      this.props.setToCover(id);
+    }
   }
   
   render(){
@@ -160,7 +164,7 @@ class ImageGallery extends React.Component {
           <div>
               { this.props.images.map(
                 function(image, index){ 
-                  return <Image key={ image.id } id={ image.id } url={image.name.thumb.url} cover={ image.id==this.props.cover } noImage={this.props.noImage} setToCover={ this.setToCover } deleteImage={ this.deleteImage } />
+                  return <Image key={ image.id } id={ image.id } url={image.name.thumb.url} cover={ image.id==this.props.cover } mine={ this.props.mine } noImage={this.props.noImage} setToCover={ this.setToCover } deleteImage={ this.deleteImage } />
                 }.bind(this))
               }
           </div>
@@ -179,6 +183,7 @@ class Image extends React.Component {
     
     this.setToCover=this.setToCover.bind(this);
     this.deleteImage=this.deleteImage.bind(this);
+    this.chooseClasses=this.chooseClasses.bind(this);    
   }  
   
   deleteImage(event){
@@ -203,14 +208,23 @@ class Image extends React.Component {
     });
     $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window' });    
   }
-  
+
+  chooseClasses(){
+    var classes='';
+    classes+=this.props.cover ? "thumbnail cover" : "thumbnail";
+    classes+=this.props.mine ? " can-cover" : "";
+    return classes;
+  }
+    
   render(){
     return(
-        <div  ref={ this.rootRef } className={ this.props.cover ? "thumbnail cover" : "thumbnail" } onClick={ this.setToCover } >
+        <div  ref={ this.rootRef } className={ this.chooseClasses() } onClick={ this.setToCover } >
           <img src={this.props.url} />
+          { this.props.mine==true ?
           <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteImage } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
             <i className="fa fa-remove"></i>
           </button>
+          : null }
         </div>
     )
   }

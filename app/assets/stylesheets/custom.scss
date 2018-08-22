@@ -162,6 +162,13 @@ body {
   text-decoration: none;
 }
 
+.sidebar-nav li a.active {
+  background-color: rgba($primary,.2);
+}
+.sidebar-nav li a.active:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .sidebar-nav>.sidebar-brand {
   //height: 65px;
   font-size: 18px;
@@ -341,9 +348,9 @@ body{
     .center-panel{
       display: table;
       position: absolute;
-      width: 50%;
+      width: 76%;
       left: 50%;
-      margin-left: -25%;
+      margin-left: -38%;
       padding: 25px;
       border-spacing: 10px;      
     }
@@ -503,7 +510,6 @@ body{
   float: left;
   overflow: hidden;
   position: relative;
-  cursor: pointer;
   & img{
     max-width:100%;
     max-height:100%;
@@ -526,7 +532,9 @@ body{
 .thumbnail.cover{
   border:1px solid $primary;
 }
-
+.thumbnail.can-cover{
+  cursor: pointer;
+}
 
 /*Twitter typeahead override*/
 .twitter-typeahead{
@@ -543,21 +551,26 @@ body{
   top:-1px;
   right:18px;
   width:500px;
-  height:60px;
+  height:120px;
   padding:10px;
   border-radius: 0 0 0 5px;
   transition: top 0.5s ease-in-out;
   i{
     cursor: pointer;
   }
+  
+  .options{
+    width:100%;
+  }
 }
 
 .search-box-show{
-  width:60px;
+  width: 60px;
+  height: 60px;
 }
 
 .search-box-hidden{
-  top:-60px;
+  top:-120px;
   transition: top 0.5s ease-in-out;
 }
 

@@ -1,16 +1,3 @@
-# == Schema Information
-#
-# Table name: books
-#
-#  id          :bigint(8)        not null, primary key
-#  title       :string(255)
-#  description :text(65535)
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  user_id     :integer
-#  image       :string(255)
-#
-
 class Book < ApplicationRecord
   validates :title, presence: {message: 'Please enter a title'}, allow_nil: false, allow_blank: false
   validates :title, length: { in: 2..100 , message:'Title must be between 2 and 100 characters long'}, allow_nil: false, allow_blank: false
@@ -27,4 +14,8 @@ class Book < ApplicationRecord
   belongs_to  :author
   has_many    :images, dependent:   :destroy
 
-end
+    
+  has_many :loans
+  has_many :users, :through => :loans
+  
+  end

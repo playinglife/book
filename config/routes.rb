@@ -11,7 +11,10 @@ Rails.application.routes.draw do
   #get 'book/destroy'
   #get 'welcome/index'
   delete  'books/destroyImage/:id',   to:   'books#destroyImage'
-  get     'authors/typeahead/:query',  to:   'authors#typeahead'
+  get     'authors/typeahead/:query', to:   'authors#typeahead'
+  
+  get     'books/others',             to:   'books#others'
+
 
   devise_for :users, :controllers => {sessions: 'sessions', registrations: 'registrations', passwords: 'passwords'}
   devise_for :admin_users, ActiveAdmin::Devise.config

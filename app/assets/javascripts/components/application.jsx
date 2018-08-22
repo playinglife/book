@@ -36,16 +36,19 @@ class Application extends React.Component {
   /*Constructor*/
   constructor(props){
     super(props);
-    this.state={};
-    this.state.data=this.props.data;
-    this.state.component=this.props.component!==undefined?this.props.component:null;
-    this.state.loggedIn=this.props.loggedIn;
+    this.state={
+      data: this.props.data,
+      component: this.props.component!==undefined?this.props.component:null,
+      loggedIn: this.props.loggedIn,
+      menuActive: 1
+    }
     
     this.unlockToken=this.props.unlock_token;
     this.resetPasswordToken=this.props.reset_password_token;
     
     this.firstRun=true;
-        
+    this.menuOrder={BookList: 1,BorrowList: 2};    
+    
     this.changeComponent.bind(this);
     this.loadComponent.bind(this);
     this.notify.bind(this);
@@ -141,11 +144,12 @@ class Application extends React.Component {
   }
   
   changeComponent(what,data,event){
-    if (this.state.component!=what){
-      if (this.lastComponent!=this.state.component){
-        this.lastComponent=this.state.component;
-      }
-      this.setState({component: what,data: data});
+    if (this.state.component!=what || !global.helpers.isEqual(this.state.data,data)/* || !global.helpers.emptyObject(data)*/){
+      //if (this.lastComponent!=this.state.component && this.lastComponentData!=this.state.data){
+      this.lastComponent=this.state.component;
+      this.lastComponentData=this.state.data;
+      //}
+      this.setState({component: what,data: data, menuActive: typeof this.menuOrder[what]!='undefined' ? this.menuOrder[what] : 0 });
     }
     if (event){
         event.preventDefault();
@@ -170,11 +174,7 @@ class Application extends React.Component {
   /*Methods*/
   loadComponent(){
     var ComponentName=eval(this.state.component);
-    if (this.firstRun){
-        return ( <ComponentName data={ this.state.data } cancel={ this.cancel.bind(this) } changeComponent={ this.changeComponent.bind(this) } noImage={ this.props.noImage } addNewBook={ this.addNewBook }/> );
-    }else{
-        return ( <ComponentName cancel={ this.cancel.bind(this) } noImage={ this.props.noImage } /> );
-    }
+    return ( <ComponentName key={ Date.now() } data={ this.state.data } cancel={ this.cancel.bind(this) } changeComponent={ this.changeComponent.bind(this) } noImage={ this.props.noImage } addNewBook={ this.addNewBook }/> );
   }
 
   notify(type,title,message){
@@ -251,10 +251,10 @@ class Application extends React.Component {
                         </a>
                     </li>
                     <li>
-                        <a href='' onClick={ this.changeComponent.bind(this, 'BookList', {}) }>My Books</a>
+                        <a className={ this.state.menuActive==this.menuOrder['BookList'] ? "active" : "" } href='' onClick={ this.changeComponent.bind(this, 'BookList', {mine: true}) }>My Books</a>
                     </li>
                     <li>
-                        <a href='' onClick={ this.changeComponent.bind(this, 'Friends', {}) }>Friends</a>
+                        <a className={ this.state.menuActive==this.menuOrder['BorrowList'] ? "active" : "" } href='' onClick={ this.changeComponent.bind(this, 'BorrowList', {mine: false}) }>My friends' books</a>
                     </li>
                     <li>
                     <a rel="nofollow" href="" onClick={ this.logout.bind(this) }>Sign out</a>
@@ -263,7 +263,7 @@ class Application extends React.Component {
             </div>
             
             <div id="the-content">
-            { this.state.component!==null ? this.loadComponent() : "" }
+            { this.state.component!==null ? this.loadComponent() : null }
             </div>
             <Loader />
             <div className=".notifications.top-right"></div>

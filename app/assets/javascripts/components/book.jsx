@@ -2,6 +2,8 @@ APIUrls['Book']=window.origin+'/books';
 APIUrls['DeleteImage']=window.origin+'/books/destroyImage';
 APIUrls['AuthorTypeahead']=window.origin+'/authors/typeahead';
 
+APIUrls['BookOthers']=window.origin+'/books/others';
+
 class NewBook extends React.Component{
     constructor(props){
         super(props);
@@ -50,13 +52,24 @@ class NewBook extends React.Component{
     }*/
 
     componentWillReceiveProps(someProps) {
-        if (typeof someProps.data.book.id!='undefined'){
+      /*If key is set on application.jsx where component is loaded then this method will not be called because a new component will be created
+        if (someProps.data && someProps.data.book && typeof someProps.data.book.id!='undefined'){
             this.newBook=false;
+            if (someProps.data){
+              if (typeof someProps.data.title!='undefined'){ this.setState(someProps.data); }
+            }
         }else{
             this.newBook=true;
-        }
-        $(this.rootRef.current).find('#title').val(typeof someProps.data.title!='undefined' ? someProps.data.title : '');
-        $(this.rootRef.current).find('#description').val(typeof someProps.data.description!='undefined' ? someProps.data.description : '');
+            this.setState({
+              book: null,
+              images: [],
+              cover: null
+            });
+            $(this.rootRef.current).find('#title').val(typeof someProps.data.title!='undefined' ? someProps.data.title : '');
+            $(this.rootRef.current).find('#author').val(typeof someProps.data.author!='undefined' ? someProps.data.author : '');
+            $(this.rootRef.current).find('#description').val(typeof someProps.data.description!='undefined' ? someProps.data.description : '');
+            $(this.rootRef.current).find('#quantity').val(typeof someProps.data.quantity!='undefined' ? someProps.data.quantity : '');
+        }*/
     }    
 
     componentDidMount(){
@@ -204,6 +217,7 @@ class NewBook extends React.Component{
             obj.description=data.description;
             self.setState({book: obj});
             $(self.saveButton.current).prop('disabled', false);
+            self.props.changeComponent('BookList',{mine: true});
           },
           callbackFailure:function(){
             $(self.saveButton.current).prop('disabled', false);
@@ -276,7 +290,7 @@ class NewBook extends React.Component{
                   </div>
                   <h3>Select cover image</h3>
                   <div className="field">
-                    <ImageGallery images={ this.state.images } cover={ !this.newBook ? this.state.cover : null } setToCover={ this.setToCover } deleteImage={ this.deleteImage } />
+                    <ImageGallery images={ this.state.images } cover={ !this.newBook ? this.state.cover : null } setToCover={ this.setToCover } deleteImage={ this.deleteImage } mine={ this.props.mine }/>
                   </div>
                 </form>
                : '' }
@@ -292,10 +306,11 @@ class Book extends React.Component {
   constructor(props){
     super(props);
     this.rootRef = React.createRef();
-    
     this.filteredOut=false;
     
     this.getCoverUrl=this.getCoverUrl.bind(this);        
+    
+    this.editOrBorrowBook=this.editOrBorrowBook.bind(this);
   }
 
   componentDidMount(){
@@ -308,9 +323,10 @@ class Book extends React.Component {
   }
     
   componentWillReceiveProps(someProps) {
-      if (someProps.filter!=null && someProps.filter.trim!=''){
-        var regexp=new RegExp(someProps.filter, "i");
-        if (this.props.book.title.match(regexp) || this.props.book.description.match(regexp) || this.props.book.author.match(regexp)){
+    if (someProps.filter){
+      if (someProps.filter.query!=null && someProps.filter.query.trim!=''){
+        var regexp=new RegExp(someProps.filter.query, "i");
+        if (this.props.book.title.match(regexp) || this.props.book.description.match(regexp) || (this.props.book.author!=null) && this.props.book.author.match(regexp)) {
           //LIKE someProps.filter || this.props.description LIKE someProps.filter || this.props.author LIKE someProps.filter ){
           this.filteredOut=false;
         }else{
@@ -319,15 +335,23 @@ class Book extends React.Component {
       }else{
         this.filteredOut=false;
       }
+      if (this.filteredOut==false && someProps.filter.option!='All' && ( (someProps.filter.option=='GivenTaken' && this.props.book.givenTaken==false) || (someProps.filter.option=='NotGivenTaken' && this.props.book.givenTaken==true) ) ){
+        this.filteredOut=true;
+      }
+    }
   }    
     
   getCoverUrl(){
-    var coverId=this.props.book.cover;
-    var img=this.props.book.images.find(function(img){ return img.id==coverId});
-    if (typeof img=='undefined'){
-      return this.props.noImage;
+    if (this.props.book.cover!=null){
+      var coverId=this.props.book.cover;
+      var img=this.props.book.images.find(function(img){ return img.id==coverId});
+      if (typeof img=='undefined'){
+        return this.props.noImage;
+      }else{
+        return img.name.url;
+      }
     }else{
-      return img.name.url;
+      return this.props.noImage;
     }
   }  
     
@@ -343,24 +367,33 @@ class Book extends React.Component {
       event.preventDefault();
   }*/
   
-  editBook(event){
-      this.props.editBook({book: this.props.book} );
-      event.preventDefault();
+  editOrBorrowBook(event){
+    if (this.props.mine==true){
+      this.props.editBook({book: this.props.book, mine: this.props.mine} );
+    }else{
+      this.props.borrowBook({book: this.props.book, mine: this.props.mine} );
+    }
+    event.preventDefault();
+    
   }
 
   render() {
     if (this.filteredOut==false){
       return (
-          <div className="panel card" ref={ this.rootRef } onClick={ this.editBook.bind(this) }>
+          <div className="panel card" ref={ this.rootRef } onClick={ this.editOrBorrowBook }>
             <div>
               <img className="card-img-top" src={ this.getCoverUrl()+"?sync="+Date.now() } />
             </div>
             <div className="card-body">
             <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.book.title }>{ this.props.book.title }</div>
             </div>
-            <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteBook.bind(this) } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
-              <i className="fa fa-remove"></i>
-            </button>
+            { this.props.mine==true ?
+              <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteBook.bind(this) } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
+                <i className="fa fa-remove"></i>
+              </button>
+            : 
+              null
+            }
           </div>
       )
     }else{
@@ -369,28 +402,30 @@ class Book extends React.Component {
   }
 }
 
-class BookList extends React.Component {
 
-  /*Constructor*/
+
+class BookList extends React.Component {
   constructor(props){
     super(props);
-
     if (this.props.data){
         this.state={
-          'books':this.props.data,
-          'filter': null, //null if there is no filer, query if there is a filter
-          'showFilter': false
+          books:this.props.data,
+          filter: null, //null if there is no filer, query if there is a filter
+          showFilter: false,
+          mine: this.props.data.mine  //Shows if my books are displayed or other peoples' books are displayed
         };
         this.state={
-          'books':null, //The list of books is empty and will be populated through a GET request
-          'filter': null, //null if there is no filer, query if there is a filter
-          'showFilter': false
+          books:null, //The list of books is empty and will be populated through a GET request
+          filter: null, //null if there is no filer, query if there is a filter
+          showFilter: false,
+          mine: this.props.data.mine
         }
     }else{
         this.state={
-          'books':null,
-          'filter': null, //null if there is no filer, query if there is a filter
-          'showFilter': false
+          books:null,
+          filter: null, //null if there is no filer, query if there is a filter
+          showFilter: false,
+          mine: this.props.data.mine
         }
     }
     this.getListBookUrl=APIUrls['GetListBook'];
@@ -398,15 +433,44 @@ class BookList extends React.Component {
     
     this.filter=this.filter.bind(this);
     this.toggleFilter=this.toggleFilter.bind(this);
+    this.reloadData=this.reloadData.bind(this);
+    this.editBook=this.editBook.bind(this);
+    this.borrowBook=this.borrowBook.bind(this);
   }
 
 
   /*Life cycle*/
   componentDidMount() {
+    this.reloadData();
+  }
+  
+  componentWillReceiveProps(newProps, newState){
+      if (this.state.mine!=newProps.data.mine){
+        this.setState({mine: newProps.data.mine});
+      }
+  }
+
+  componentDidUpdate(prevProps, prevState){
+    if (this.state.mine!=prevState.mine){
+      this.reloadData();
+    }
+  }
+
+  shouldComponentUpdate(nextProps, nextState){
+      if ( (this.state.books==null) || (!global.helpers.isEqual(this.state.books.length,nextProps.data)) || (this.state.mine!=nextProps.data.mine)){
+          return true
+      }else{
+          return false;
+      }
+  }
+
+
+  /*Methods*/
+  reloadData(){
     var self=this;
     var data={};
     
-    global.fetch(APIUrls['Book'], 'GET', null, {
+    global.fetch(this.state.mine==true ? APIUrls['Book'] : APIUrls['BookOthers'], 'GET', null, {
       callbackSuccess:function(response){
         self.setState({books:response.data});
       },
@@ -418,23 +482,9 @@ class BookList extends React.Component {
         $(self.saveButton.current).prop('disabled', false); 
         self.setState({books:null});
       }
-    });    
+    });        
   }
   
-  /*componentWillReceiveProps(newProps){
-      this.setState({books:newProps.data});
-  }*/
-
-  shouldComponentUpdate(nextProps, nextState){
-      if ( (this.state.books==null) || (!global.helpers.isEqual(this.state.books.length,nextProps.data)) ){
-          return true
-      }else{
-          return false;
-      }
-  }
-
-
-  /*Methods*/
   deleteBook(bookId){
     var self=this;
     var data={};
@@ -462,6 +512,9 @@ class BookList extends React.Component {
   editBook(bookData){
       this.props.changeComponent('NewBook',bookData);
   }
+  borrowBook(bookData){
+      this.props.changeComponent('BorrowBook',bookData);
+  }
 
   cancelNewEdit(){
     
@@ -483,25 +536,33 @@ class BookList extends React.Component {
       if (this.state.books.length>0){
         return (
           <div id='books'>
-            { this.state.books.map(function(book, index){ return <Book key={ index } book={ book } noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook.bind(this) } filter={ this.state.filter } />}.bind(this)) }
-            <Search filter={ this.state.filter } showFilter={ this.state.showFilter } onFilter={ this.filter } toggleFilter={ this.toggleFilter }/>
+            { this.state.books.map(function(book, index){ return <Book key={ index } book={ book } noImage={this.props.noImage} deleteBook={ this.deleteBook.bind(this) } editBook={ this.editBook } borrowBook={ this.borrowBook } filter={ this.state.filter } mine={ this.state.mine }/>}.bind(this)) }
+            <Search filter={ this.state.filter } mine={ this.state.mine } showFilter={ this.state.showFilter } onFilter={ this.filter } toggleFilter={ this.toggleFilter }/>
           </div>
         )
       }else{
         return (
           <div id='books'>
             <div className='no-books'>
-              <div>
+              { this.state.mine ? 
                 <div>
-                You have no books in your list<br />
-                Add a book now<br /><br />
+                  <div>
+                    You have no books in your list<br />
+                    Add a book now<br /><br />
+                  </div>
+                  <div>
+                    <button className="btn btn-primary" onClick={ this.props.addNewBook } >
+                      <i className="fa fa-plus add-new-book-button"></i>
+                    </button>
+                  </div>
                 </div>
+              :
                 <div>
-                <button className="btn btn-primary" onClick={ this.props.addNewBook } >
-                  <i className="fa fa-plus add-new-book-button"></i>
-                </button>
+                  <div>
+                    There are no public books from other users<br /><br />
+                  </div>
                 </div>
-              </div>
+              }
             </div>
           </div>
         )
@@ -511,3 +572,10 @@ class BookList extends React.Component {
     }
   }
 }
+BookList.defaultProps={
+  
+}
+BookList.propTypes={
+}
+
+BorrowList=BookList; //Alias for the menu to be able to show the active menu item
