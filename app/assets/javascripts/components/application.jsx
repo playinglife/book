@@ -6,6 +6,13 @@ APIUrls['Reset']=window.origin+'/users/password';
 APIUrls['Unlock']=window.origin+'/users/unlock';
 APIUrls['Logout']=window.origin+'/users/sign_out';
 
+APIUrls['Book']=window.origin+'/books';
+APIUrls['DeleteImage']=window.origin+'/books/destroyImage';
+APIUrls['AuthorTypeahead']=window.origin+'/authors/typeahead';
+
+APIUrls['BookOthers']=window.origin+'/books/others';
+APIUrls['BorrowBook']=window.origin+'/books/borrow';
+
 var global={
     app: null   /*Will be set in application didMount event*/
 }

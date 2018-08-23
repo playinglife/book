@@ -63,26 +63,23 @@ class BorrowBook extends React.Component{
     }
 
     borrow(){
-        $(this.saveButton.current).prop('disabled', true);
-        var url=APIUrls['Book']+'/'+this.state.book.id;
+        $(this.borrowButton.current).prop('disabled', true);
+        var url=APIUrls['BorrowBook']+'/'+this.state.book.id;
         var method='PUT';
         var data={};
         
         var self=this;
         global.fetch(url, method, data, {
           callbackSuccess:function(){
-            global.app.notify('success','','Book succesfully updated');
-            var obj=self.state.book;
-            obj.title=data.title;
-            obj.description=data.description;
-            self.setState({book: obj});
-            $(self.saveButton.current).prop('disabled', false);
+            global.app.notify('success','','Book succesfully borrowed');
+            $(self.borrowButton.current).prop('disabled', false);            
+            self.props.changeComponent('BorrowList',{mine: false});
           },
           callbackFailure:function(){
-            $(self.saveButton.current).prop('disabled', false);
+            $(self.borrowButton.current).prop('disabled', false);
           },
           callbackError:function(){
-            $(self.saveButton.current).prop('disabled', false); 
+            $(self.borrowButton.current).prop('disabled', false); 
           }
         });
     }
@@ -113,14 +110,14 @@ class BorrowBook extends React.Component{
                     <textarea className="form-control" id="description" defaultValue={ this.state.book.description } maxLength="1000" disabled='true'>
                     </textarea>
                 </div>
-                <div className="field">
-                    <label>Quantity</label><br/>
-                    <input className="form-control" id="quantity" defaultValue={ this.state.book.quantity } disabled='true' />
-                </div>
+                { this.props.data.book.available==0 ?
+                "There are no more copies available." : null }
                 <hr/>
                 <div className="actions">
-                    <input value="Back" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
+                    <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
+                    { this.props.data.book.available>0 ?
                     <input value="Borrow" className="btn btn-primary pull-right" type="button" onClick={ this.borrow } ref={ this.borrowButton }/>
+                    : null }
                 </div>
             </form>
             </div>

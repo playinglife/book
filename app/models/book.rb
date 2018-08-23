@@ -12,7 +12,7 @@ class Book < ApplicationRecord
   
   belongs_to  :user
   belongs_to  :author
-  has_many    :images, dependent:   :destroy
+  has_many    :images, dependent: :destroy, autosave: true
 
     
   has_many :loans

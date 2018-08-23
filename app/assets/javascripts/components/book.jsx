@@ -1,8 +1,3 @@
-APIUrls['Book']=window.origin+'/books';
-APIUrls['DeleteImage']=window.origin+'/books/destroyImage';
-APIUrls['AuthorTypeahead']=window.origin+'/authors/typeahead';
-
-APIUrls['BookOthers']=window.origin+'/books/others';
 
 class NewBook extends React.Component{
     constructor(props){
@@ -124,7 +119,10 @@ class NewBook extends React.Component{
             }
           });
           
-        $(this.rootRef.current).find('#authorBirthday').datetimepicker();
+        $(this.rootRef.current).find('#authorBirthday').datetimepicker({
+          format: 'MM/DD/YYYY',
+          viewMode: 'years'
+        });
       }
     }
 
@@ -228,6 +226,11 @@ class NewBook extends React.Component{
         });
     }
     
+    cancelKeys(event){
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     render(){
         return(
           <div className="center-panel">
@@ -252,14 +255,14 @@ class NewBook extends React.Component{
 
                 <div className="field" id='authorBirthdayGroup'>
                   <label>New author's birthday</label><br/>
-                        <div className="form-group">                  
-                          <div className='input-group date' id='authorBirthday'>
-                            <input type='text' className="form-control" />
-                            <span className="input-group-addon">
-                                <span className="glyphicon glyphicon-calendar"></span>
-                            </span>
+                    <div className="form-group">
+                      <div className="input-group date" id="authorBirthday" data-target-input="nearest">
+                          <input type="text" className="form-control datetimepicker-input" data-target="#authorBirthday" onKeyDown={ this.cancelKeys }/>
+                          <div className="input-group-append btn btn-primary" data-target="#authorBirthday" data-toggle="datetimepicker">
+                              <div className=""><i className="fa fa-calendar"></i></div>
                           </div>
-                        </div>
+                      </div>
+                  </div>                        
                 </div>
                   
                 <div className="field">
@@ -273,7 +276,7 @@ class NewBook extends React.Component{
                 </div>
                 <hr/>
                 <div className="actions">
-                    <input value="Back" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
+                    <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
                     { !this.newBook ? <input value="Save" className="btn btn-primary pull-right" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/> : '' }
                 </div>
             </form>
@@ -290,7 +293,7 @@ class NewBook extends React.Component{
                   </div>
                   <h3>Select cover image</h3>
                   <div className="field">
-                    <ImageGallery images={ this.state.images } cover={ !this.newBook ? this.state.cover : null } setToCover={ this.setToCover } deleteImage={ this.deleteImage } mine={ this.props.mine }/>
+                    <ImageGallery images={ this.state.images } cover={ !this.newBook ? this.state.cover : null } setToCover={ this.setToCover } deleteImage={ this.deleteImage } mine={ this.props.data.mine }/>
                   </div>
                 </form>
                : '' }
@@ -319,9 +322,13 @@ class Book extends React.Component {
         popout: true,
         singleton: true
     });
-    $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window' });
+    $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window', trigger : 'hover' });
   }
-    
+  
+  componentDidUpdate(){
+    $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window', trigger : 'hover' });
+  }
+  
   componentWillReceiveProps(someProps) {
     if (someProps.filter){
       if (someProps.filter.query!=null && someProps.filter.query.trim!=''){
@@ -368,6 +375,7 @@ class Book extends React.Component {
   }*/
   
   editOrBorrowBook(event){
+    $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip('hide');
     if (this.props.mine==true){
       this.props.editBook({book: this.props.book, mine: this.props.mine} );
     }else{
@@ -381,7 +389,13 @@ class Book extends React.Component {
     if (this.filteredOut==false){
       return (
           <div className="panel card" ref={ this.rootRef } onClick={ this.editOrBorrowBook }>
-            <div>
+            { this.props.mine==false && this.props.book.available==0 ?
+              <div className="corner-ribbon red shadow" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title="No copies available">
+                <i className="fa fa-ban">
+                </i>
+              </div>
+            : null }
+            <div className="image">
               <img className="card-img-top" src={ this.getCoverUrl()+"?sync="+Date.now() } />
             </div>
             <div className="card-body">
@@ -520,14 +534,14 @@ class BookList extends React.Component {
     
   }
 
-  filter(query){
-    this.setState({filter: query});
+  filter(filter){
+    this.setState({filter: filter});
   }
   toggleFilter(show){
     if (show==true){
       this.setState({showFilter: true});
     }else{
-      this.setState({showFilter: false, filter: null});
+      this.setState({showFilter: false, filter: {query: null, option: 'All'} });
     }
   }
   

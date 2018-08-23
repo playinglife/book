@@ -22,5 +22,5 @@
 //= require bootstrap_confirm
 //= require bootstrap-typeahead-rails
 //= require moment
-//= require bootstrap-datetimepicker
+//= require tempusdominus-bootstrap-4.js
 //= require_tree .

@@ -3,8 +3,11 @@ class Search extends React.Component{
     super(props);
   
     this.state={
-      option: 'All'
+      option: 'All',
+      query: this.props.filter && this.props.filter.query ? this.props.filter.query : null
     }
+    
+    this.filterApplied=false;
     
     this.rootRef=React.createRef();
   
@@ -19,17 +22,36 @@ class Search extends React.Component{
     $(this.rootRef.current).find('[data-toggle=tooltip]').tooltip({ boundary: 'window' });
   }
   
+  componentWillReceiveProps(newProps){
+      if (newProps.filter!=null){
+        var newState={
+          query: this.state.query,
+          option: this.state.option
+        }
+        if (typeof newProps.filter.query!='undefined' && this.state.query!=newProps.filter.query){
+          newState.query=newProps.filter.query;
+        }
+        if (typeof newProps.filter.option!='undefined' && this.state.option!=newProps.filter.option){
+          newState.option=newProps.filter.option;
+        }
+        this.setState(newState);
+        ((newState.query==null || newState.query=='') && newState.option=='All') ? this.filterApplied=false : this.filterApplied=true;      
+      }
+  }
+  
   filter(){
     this.props.onFilter({query: $(this.rootRef.current).find('input').val(), option: this.state.option});
   }
   clear(){
-    this.props.onFilter({query: $(this.rootRef.current).find('input').val(''), option: 'All' });
+    $(this.rootRef.current).find('input').val('');
+    this.props.onFilter({query: '', option: this.state.option });
     //this.props.onFilter('');
   }
   hide(){
-    this.props.onFilter({query: $(this.rootRef.current).find('input').val(''), option: 'All' });
-    //this.props.onFilter('');
+    $(this.rootRef.current).find('input').val('');
     this.setState({option: 'All'});
+    //this.props.onFilter({query: $(this.rootRef.current).find('input').val(''), option: 'All' });
+    //this.props.onFilter('');
     this.props.toggleFilter(false);
   }
   show(){
@@ -38,18 +60,18 @@ class Search extends React.Component{
   select(event){
     this.setState({option: $(event.target).attr('data-option')});
   }
-  
+    
   render() {
     return (
       <div>
         <div className={ this.props.showFilter==true ? "panel search-box" : "panel search-box search-box-hidden" } ref={ this.rootRef }>
           <div className="input-group mb-3">
-            <div className={ this.props.filter==null || this.props.filter=='' ? "input-group-prepend hidden" : "input-group-prepend" }>
+            <div className={ this.filterApplied==true ? "input-group-prepend" : "input-group-prepend hidden" }>
             <span className="input-group-text user-alert">
               <i className="fa fa-filter" data-toggle="tooltip" title="The results you are seeing are filtered"></i>
             </span>
             </div>
-            <input type="text" className="form-control" aria-label="Amount (to the nearest dollar)" />
+            <input type="text" className="form-control" onKeyDown={ this.filterChanged } />
             <div className="input-group-append">
             <span className="input-group-text">
               <i className="fa fa-close" data-toggle="tooltip" title="Clear filter" onClick={ this.clear }></i>

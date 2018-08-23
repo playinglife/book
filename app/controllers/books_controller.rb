@@ -3,18 +3,14 @@ class BooksController < ApplicationController
   #before_action :authenticate_user!
 
   def index
-    @data={}
-
     #if user_signed_in?
-      @success=true;
-      @message='';
-
       @user=current_user
       @data=[];
       #@user.books.includes(:author).includes(:loans).where('loan.loaner_id = ? AND loan.return_date IS NOT NULL AND loans.return_date<NOW',"#{@user.id}").
       #count(:borrower_id).each{ |book| 
 
-      @user.books.left_joins(:author, :loans).where('(loans.lend_date IS NOT NULL AND loans.return_date IS NULL) OR (loans.lend_date IS NULL AND loans.return_date IS NULL)').group('books.id').each{ |book| 
+      #@user.books.left_joins(:author, :loans).where('(loans.lend_date IS NOT NULL AND loans.return_date IS NULL) OR (loans.lend_date IS NULL AND loans.return_date IS NULL)').group('books.id').each{ |book| 
+      @user.books.left_joins(:author, :loans).group('books.id').each{ |book| 
 
         if !book.images.empty? then
           cover=book.images.find { |b| b.cover==true }
@@ -34,8 +30,9 @@ class BooksController < ApplicationController
           author: book.author.blank? ? nil : "#{book.author.firstname} #{book.author.lastname}",
           images: book.images,
           quantity: book.quantity,
+          available: book.available,
           cover: cover,
-          givenTaken: book.loans.count>0 ? true : false
+          givenTaken: book.loans.where(return_date: nil).count>0 ? true : false
         });
       }
     #else
@@ -51,8 +48,6 @@ class BooksController < ApplicationController
   end
 
   def create
-    @data={}
-
     if user_signed_in?
         book=Book.new;
         book.title='';
@@ -64,7 +59,7 @@ class BooksController < ApplicationController
             @data=book
           else
             @success=false
-            @message='Could not save data'
+            self.addMessage('Could not save data')
           end
         end
       else
@@ -78,13 +73,11 @@ class BooksController < ApplicationController
 
 
     def update
-        @data={}
-
         if user_signed_in?
             book=Book.find(params[:id])
             if book.user!=current_user
               @success=false
-              @message="You don't own this book so you can't change it."
+              self.addMessage("You don't own this book so you can't change it.")
             end
 
             if (@success)
@@ -92,7 +85,7 @@ class BooksController < ApplicationController
                 existing=current_user.books.find_by_title(params[:title])
                 if existing && existing.id!=params[:id].to_i
                   @success=false
-                  @message="There is already a book with the same title."
+                  self.addMessage("There is already a book with the same title.")
                 else
                   book.title=params[:title];
                 end
@@ -102,9 +95,14 @@ class BooksController < ApplicationController
               end
               if (params[:author])
                 names=params[:author].split(" ")
-                lastname=names[names.length-1]
-                names.pop
-                firstname=names.join(" ")
+                if names.length>1
+                  lastname=names[names.length-1]
+                  names.pop
+                  firstname=names.join(" ")
+                else
+                  firstname=names[0]
+                  lastname=''
+                end
                 #joined=params[:author].gsub(/\s+/, "")
 
                 author=Author.where("firstname=? AND lastname=?","#{firstname}","#{lastname}").first
@@ -125,7 +123,13 @@ class BooksController < ApplicationController
                 book.author=author
               end
               if (params[:quantity])
-                book.quantity=params[:quantity];
+                dif=book.available-(book.quantity-params[:quantity].to_i)
+                if dif>=0
+                  book.quantity=params[:quantity];
+                else
+                  @success=false
+                  self.addMessage("You can't reduce the total amount to #{params[:quantity]} because there are #{dif.abs} books lended")
+                end
               end
               if (params[:file])
                 image=Image.new
@@ -133,22 +137,21 @@ class BooksController < ApplicationController
                 book.images.push(image);
               end
               if (params[:cover])
+
                 cover=Image.find(params[:cover])
                 if (cover.book.user==current_user)
 
                   book.images.each { |item|
-                    if item.cover
+                    if item.id==params[:cover].to_i
+                      item.cover=true
+                    elsif item.cover
                       item.cover=false
-                      item.save
                     end
                   }
-
-                  cover.cover=true
-                  cover.save
+                  
                 else
                   @success=false
-                  @success=false
-                  @message="You don't own this book so you can't change it."
+                  self.addMessage("You don't own this book so you can't change it.")
                 end
               end
             end
@@ -156,20 +159,7 @@ class BooksController < ApplicationController
             if (@success)
               if (!params[:file])   #Only check validation errors if book is saved and not just an image upload for the book
                 book.valid?
-                if (book.errors.messages.length>0)
-                  @success=false;
-                  @message=Array.new;
-
-                  book.errors.messages.each do |key,attrMessage|
-                    attrMessage.each do |errMessage|
-                      @message.push errMessage
-                    end
-                  end
-
-                  if @message.length==1
-                    @message=@message[0]
-                  end
-                end
+                self.checkErrors(book)
               end
 
               if @success
@@ -185,7 +175,7 @@ class BooksController < ApplicationController
                   end
                 else
                   @success=false
-                  @message='Could not save data'
+                  self.addMessage('Could not save data')
                 end
               end
 
@@ -199,18 +189,13 @@ class BooksController < ApplicationController
     end
 
     def destroy
-        @data={}
-
         if user_signed_in?
-            @success=true;
-            @message='';
-
             book=Book.find(params[:id])
             if book.user==current_user
                 book.delete
             else
                 @success=false
-                @message="You don't own this boo so you can't delete it."
+                self.addMessage("You don't own this boo so you can't delete it.")
             end
         else
           @success=false
@@ -221,19 +206,14 @@ class BooksController < ApplicationController
     end
 
     def destroyImage
-        @data={}
-
         if user_signed_in?
-            @success=true;
-            @message='';
-
             image=Image.find(params[:id])
 
             if image.book.user==current_user
               image.delete
             else
               @success=false
-              @message="You don't own this book so you can't delete images for it."
+              self.addMessage("You don't own this book so you can't delete images for it.")
             end
         else
           @success=false
@@ -243,9 +223,8 @@ class BooksController < ApplicationController
         render json: {success: @success, message: @message, data: @data}, status: :ok    
     end
 
-#Other users books
-  def others
-    @data={}
+  def others  #Other users books
+
       @user=current_user
       @data=[];
 
@@ -270,7 +249,9 @@ class BooksController < ApplicationController
               author: book.author.blank? ? nil : "#{book.author.firstname} #{book.author.lastname}",
               images: book.images,
               quantity: book.quantity,
-              cover: cover
+              available: book.available,
+              cover: cover,
+              givenTaken: book.loans.where(return_date: nil).count>0 ? true : false
             });
           }
         end
@@ -278,7 +259,41 @@ class BooksController < ApplicationController
     render json: {success: @success, message: @message, data: @data}, status: :ok
   end
 
-    def book_params
-      params.require(:book).permit(:title, :description, :image, :quantity, :image_cache, :remove_image)
+  def borrow
+    user=current_user
+    loan=Loan.where(:book_id=> params[:id], :user=> user, :return_date=> nil).first;
+    if (loan.present?)
+      @success=false
+      self.addMessage('You have already borrowed this book')
     end
+
+    if (@success==true)
+      ActiveRecord::Base.transaction do
+        bookToBorrow=Book.find(params[:id]);
+        loan=Loan.new
+        loan.user = user
+        loan.book = bookToBorrow
+        loan.lend_date = Time.now
+        loan.days = 7
+        loan.return_date = nil
+
+        loan.valid?
+        self.checkErrors(loan)
+        if (@success==true)
+          loan.save
+
+          if bookToBorrow.available>0
+            bookToBorrow.available-=1
+            bookToBorrow.save
+          end
+        end
+      end
+    end
+
+    render json: {success: @success, message: @message, data: @data}, status: :ok
+  end
+
+  def book_params
+    params.require(:book).permit(:title, :description, :image, :quantity, :image_cache, :remove_image)
+  end
 end

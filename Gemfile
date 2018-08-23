@@ -85,4 +85,6 @@ gem 'factory_bot_rails'
 gem 'rails-controller-testing'
 gem 'bootstrap-typeahead-rails'
 gem 'momentjs-rails', '>= 2.9.0'
-gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
+#gem 'bootstrap3-datetimepicker-rails', '~> 4.17.47'
+gem 'bootstrap4-datetime-picker-rails'
+gem 'whenever', require: false

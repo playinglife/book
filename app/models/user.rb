@@ -7,5 +7,5 @@ class User < ApplicationRecord
   has_many  :books, dependent: :destroy
 
   has_many	:loans
-  has_many  :lendings, class_name: "Book", :through => :loans
+  has_many  :loaned_books, class_name: "Book", :through => :loans
 end
