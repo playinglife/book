@@ -131,10 +131,14 @@ class BooksController < ApplicationController
                   self.addMessage("You can't reduce the total amount to #{params[:quantity]} because there are #{dif.abs} books lended")
                 end
               end
-              if (params[:file])
-                image=Image.new
-                image.name=params[:file]
-                book.images.push(image);
+              if (params[:files])
+                newImages=[]
+                params[:files].map{ |file|
+                  image=Image.new
+                  image.name=file
+                  book.images.push(image);
+                  newImages.push(image)
+                }
               end
               if (params[:cover])
 
@@ -170,8 +174,8 @@ class BooksController < ApplicationController
                 end
 
                 if saved
-                  if (params[:file]) 
-                    @data['newImage']=image
+                  if (params[:files]) 
+                    @data['newImages']=newImages
                   end
                 else
                   @success=false
@@ -267,9 +271,14 @@ class BooksController < ApplicationController
       self.addMessage('You have already borrowed this book')
     end
 
-    if (@success==true)
-      ActiveRecord::Base.transaction do
-        bookToBorrow=Book.find(params[:id]);
+    ActiveRecord::Base.transaction do
+      bookToBorrow=Book.find(params[:id]);
+      if bookToBorrow.available==0
+        @success=false
+        self.addMessage('There are no more copies of this book available')
+      end
+
+      if (@success==true)
         loan=Loan.new
         loan.user = user
         loan.book = bookToBorrow
@@ -287,6 +296,8 @@ class BooksController < ApplicationController
             bookToBorrow.save
           end
         end
+      else
+        ActiveRecord::Rollback
       end
     end
 

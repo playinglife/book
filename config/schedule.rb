@@ -19,6 +19,6 @@
 
 # Learn more: http://github.com/javan/whenever
 
-every 1.day, at: '3:00 am' do
-  runner "Cron.check_books_that_need_to_be_returned"
+every 1.minute do
+  runner "Cron.check_books_that_need_to_be_returned", :output => 'cron.log'
 end

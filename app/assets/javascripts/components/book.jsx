@@ -155,34 +155,50 @@ class NewBook extends React.Component{
       });          
     }
 
-    handleFile(fileObj){
-      var reader = new FileReader();
+    handleFile(filesObj){
+      var fileList=[];
+      var totalFiles=filesObj.length;
+      var processedFiles=0;
+      
+      var processFile=function(fileObj){
+        var reader = new FileReader();
+        //this.fileName = fileObj.name;
+        //this.fileType = fileObj.type;
 
-      this.fileName = fileObj.name;
-      this.fileType = fileObj.type;
+        reader.onload = function(e) {
+          processedFiles++;
+          fileList.push(reader.result);
 
-      reader.onload = function(e) {
-        this.file = reader.result;
-        
-        var root=$(this.rootRef.current);
-        let data = new FormData()
-        data.append('file', this.file);
-
-        var self=this;
-        global.fetch(APIUrls['Book']+'/'+this.state.book.id, 'PUT', data, {
-          callbackSuccess:function(response){
+          if (processedFiles==totalFiles){
+            var root=$(this.rootRef.current);
+            let data = new FormData()
             
-            var newList=self.state.images;
-            newList.push(response.data.newImage);
-            global.app.notify('success','','Image succesfully added');
-            self.setState({images: newList})
-          },
-          callbackFailure:function(){},
-          callbackError:function(){}
-        });
-        
+            for (var j=0;j<fileList.length;j++){
+              data.append('files[]', fileList[j]);
+            }
+
+            var self=this;
+            global.fetch(APIUrls['Book']+'/'+this.state.book.id, 'PUT', data, {
+              callbackSuccess:function(response){
+
+                var newList=self.state.images;
+                for (var k=0;k<response.data.newImages.length;k++){
+                  newList.push(response.data.newImages[k]);
+                }
+                global.app.notify('success','','Image succesfully added');
+                self.setState({images: newList})
+              },
+              callbackFailure:function(){},
+              callbackError:function(){}
+            });
+          }
+        }.bind(this);
+        reader.readAsDataURL(fileObj.file);
       }.bind(this);
-      reader.readAsDataURL(fileObj.file);
+      
+      for (var i=0;i<totalFiles;i++){
+        processFile(filesObj[i]);
+      }
     }
 
     saveBook(){

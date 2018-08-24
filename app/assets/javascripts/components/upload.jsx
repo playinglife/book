@@ -21,12 +21,16 @@ class FileInput extends React.Component {
     //window.removeEventListener('drop', this.handleDrop);
   }
   handleChange(e){
-    var file = e.target.files[0];
-    this.props.onFileChange({
-      file: file,
-      name: file.name,
-      type: file.type
-    });
+    var files=[];
+    for (var i=0;i<e.target.files.length;i++){
+      files.push({
+        file: e.target.files[i],
+        name: e.target.files[i].name,
+        type: e.target.files[i].type
+      });
+    }
+    
+    this.props.onFileChange(files);
   }
   dropTarget(e){
     if (this.state.active) {
