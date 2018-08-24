@@ -6,10 +6,7 @@ class BooksController < ApplicationController
     #if user_signed_in?
       @user=current_user
       @data=[];
-      #@user.books.includes(:author).includes(:loans).where('loan.loaner_id = ? AND loan.return_date IS NOT NULL AND loans.return_date<NOW',"#{@user.id}").
-      #count(:borrower_id).each{ |book| 
 
-      #@user.books.left_joins(:author, :loans).where('(loans.lend_date IS NOT NULL AND loans.return_date IS NULL) OR (loans.lend_date IS NULL AND loans.return_date IS NULL)').group('books.id').each{ |book| 
       @user.books.left_joins(:author, :loans).group('books.id').each{ |book| 
 
         if !book.images.empty? then
@@ -32,7 +29,7 @@ class BooksController < ApplicationController
           quantity: book.quantity,
           available: book.available,
           cover: cover,
-          givenTaken: book.loans.where(return_date: nil).count>0 ? true : false
+          givenTaken: book.loans.where(returned: false).count>0 ? true : false
         });
       }
     #else
@@ -255,7 +252,7 @@ class BooksController < ApplicationController
               quantity: book.quantity,
               available: book.available,
               cover: cover,
-              givenTaken: book.loans.where(return_date: nil).count>0 ? true : false
+              givenTaken: book.loans.where(returned: false).count>0 ? true : false
             });
           }
         end
@@ -265,7 +262,7 @@ class BooksController < ApplicationController
 
   def borrow
     user=current_user
-    loan=Loan.where(:book_id=> params[:id], :user=> user, :return_date=> nil).first;
+    loan=Loan.where(:book_id=> params[:id], :user=> user, :returned=> false).first;
     if (loan.present?)
       @success=false
       self.addMessage('You have already borrowed this book')
@@ -283,8 +280,7 @@ class BooksController < ApplicationController
         loan.user = user
         loan.book = bookToBorrow
         loan.lend_date = Time.now
-        loan.days = 7
-        loan.return_date = nil
+        loan.return_date = Time.now+7.days
 
         loan.valid?
         self.checkErrors(loan)

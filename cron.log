@@ -1,154 +1,166 @@
-Ok
-Running via Spring preloader in process 17642
-Ok
-Running via Spring preloader in process 17754
-Ok
-Running via Spring preloader in process 17878
-Ok
-Running via Spring preloader in process 18002
-Ok
-Running via Spring preloader in process 18114
-Ok
-Running via Spring preloader in process 18227
-Ok
-Running via Spring preloader in process 18339
-Ok
-Running via Spring preloader in process 18454
-Ok
-Running via Spring preloader in process 18566
-Ok
-Running via Spring preloader in process 18682
-Ok
-Running via Spring preloader in process 18800
-Ok
-Running via Spring preloader in process 18931
-Ok
-Running via Spring preloader in process 19043
-Ok
-Running via Spring preloader in process 19155
-Ok
-Running via Spring preloader in process 19267
-Ok
-Running via Spring preloader in process 19381
-Ok
-Running via Spring preloader in process 19493
-Ok
-Running via Spring preloader in process 19605
-Ok
-Running via Spring preloader in process 19717
-Ok
-Running via Spring preloader in process 19829
-Ok
-Running via Spring preloader in process 19943
-Ok
-Running via Spring preloader in process 20055
-Ok
-Running via Spring preloader in process 20169
-Ok
-Running via Spring preloader in process 20282
-Ok
-Running via Spring preloader in process 20397
-Ok
-Running via Spring preloader in process 20509
-Ok
-Running via Spring preloader in process 20622
-Ok
-Running via Spring preloader in process 20734
-Ok
-Running via Spring preloader in process 20846
-Ok
-Running via Spring preloader in process 20958
-Ok
-Running via Spring preloader in process 21070
-Ok
-Running via Spring preloader in process 21183
-Ok
-Running via Spring preloader in process 21297
-Ok
-Running via Spring preloader in process 21409
-Ok
-Running via Spring preloader in process 21521
-Ok
-Running via Spring preloader in process 21634
-Ok
-Running via Spring preloader in process 21747
-Ok
-Running via Spring preloader in process 21861
-Ok
-Running via Spring preloader in process 21973
-Ok
-Running via Spring preloader in process 22091
-Ok
-Running via Spring preloader in process 22204
-Ok
-Running via Spring preloader in process 22323
-Ok
-Running via Spring preloader in process 22447
-Ok
-Running via Spring preloader in process 22559
-Ok
-Running via Spring preloader in process 22671
-Ok
-Running via Spring preloader in process 22790
-Ok
-Running via Spring preloader in process 22904
-Ok
-Running via Spring preloader in process 23022
-Ok
-Running via Spring preloader in process 23146
-Ok
-Running via Spring preloader in process 23264
-Ok
-Running via Spring preloader in process 23376
-Ok
-Running via Spring preloader in process 23489
-Ok
-Running via Spring preloader in process 23604
-Ok
-Running via Spring preloader in process 23716
-Ok
-Running via Spring preloader in process 23834
-Ok
-Running via Spring preloader in process 23946
-Ok
-Running via Spring preloader in process 24059
-Ok
-Running via Spring preloader in process 24178
-Ok
-Running via Spring preloader in process 24290
-Ok
-Running via Spring preloader in process 24402
-Ok
-Running via Spring preloader in process 24515
-Ok
-Running via Spring preloader in process 24628
-Ok
-Running via Spring preloader in process 24740
-Ok
-Running via Spring preloader in process 24858
-Ok
-Running via Spring preloader in process 24970
-Ok
-Running via Spring preloader in process 25082
-Ok
-Running via Spring preloader in process 25219
-Ok
-Running via Spring preloader in process 25335
-Ok
-Running via Spring preloader in process 25447
-Ok
-Running via Spring preloader in process 25583
-Ok
-Running via Spring preloader in process 25696
-Ok
-Running via Spring preloader in process 25808
-Ok
-Running via Spring preloader in process 25927
-Ok
-Running via Spring preloader in process 26039
-Ok
-Running via Spring preloader in process 26152
-Ok
-Running via Spring preloader in process 26264
-Ok
-Running via Spring preloader in process 26400
+
+Running via Spring preloader in process 50262
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 50480
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 50711
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 50942
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 51173
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 51406
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 51638
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 51869
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 52105
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 52415
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 52646
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 52879
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 53110
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 53343
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 53574
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 53808
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 54040
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 54271
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 54502
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 54733
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 54964
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 55197
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 55429
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 55661
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 55893
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 56125
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 56357
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 56589
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 56822
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 57053
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 57284
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 57515
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron
+Running via Spring preloader in process 57816
+Please specify a valid ruby command or the path of a script to run.
+Run 'bin/rails runner -h' for help.
+
+uninitialized constant Cron

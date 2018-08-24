@@ -19,6 +19,14 @@
 
 # Learn more: http://github.com/javan/whenever
 
+#every 1.minute do
+#  runner "Cron.check_books_that_need_to_be_returned", :output => 'cron.log'
+#end
+
+ENV['RAILS_ENV'] = "development"
+set :output, 'log/whenever.log'
+
+#every 1.day, :at => ‘10:20 am’ do
 every 1.minute do
-  runner "Cron.check_books_that_need_to_be_returned", :output => 'cron.log'
+  rake "my_tasks:cron"
 end

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h3>Hello <%= @lender.email %></h3>
+    <p>
+      Until <%= @limit_date %> you will get back the book with title '<%= @book_title %>' from <%= @borrower.email %>
+    </p>
+    <p>Thanks for using our services</p>
+  </body>
+</html>

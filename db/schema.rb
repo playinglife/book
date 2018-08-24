@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_21_180037) do
+ActiveRecord::Schema.define(version: 2018_08_24_135217) do
 
   create_table "active_admin_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "namespace"
@@ -75,10 +75,10 @@ ActiveRecord::Schema.define(version: 2018_08_21_180037) do
     t.bigint "user_id"
     t.bigint "book_id"
     t.datetime "lend_date"
-    t.integer "days"
     t.datetime "return_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "returned", default: false, null: false
     t.index ["book_id"], name: "index_loans_on_book_id"
     t.index ["user_id"], name: "index_loans_on_user_id"
   end
