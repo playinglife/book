@@ -417,10 +417,12 @@ body{
   padding:3px;
   border-radius:3px;
   overflow:hidden;
-  div{
+  h3{
     position:absolute;
     left:0px;
     top:0x;
+    line-height: 190px;
+    width:100%;
   }
 }
 

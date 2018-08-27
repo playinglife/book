@@ -36,4 +36,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  rescue_from ActionController::InvalidAuthenticityToken do
+    @success=false
+    @message='redirect'
+    @data=''
+    render json: {success: @success, message: @message, data: @data}, status: :ok
+  end
+
 end
