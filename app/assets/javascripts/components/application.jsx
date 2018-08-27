@@ -109,18 +109,7 @@ class Application extends React.Component {
           if (response && response.message=='redirect'){
             window.location.replace(response.data);
           }else{
-            if (response && response.message && response.message!=''){
-              if (response.message.constructor===Array){
-                var mess='';
-                $(response.message).each(function(ind,msg){
-                  if (mess!=''){ mess+='<br>'; }
-                  mess+=msg;
-                });
-                global.app.notify('danger','',mess);
-              }else{
-                global.app.notify('danger','',response.message);
-              }
-            }
+            this.showResponseMessages(response);
             if (typeof settings.callbackFailure=='function') { settings.callbackFailure(response, headers); } 
           }
         }
@@ -144,6 +133,21 @@ class Application extends React.Component {
   componentDidMount() {
     this.unlockToken=null;
     this.resetPasswordToken=null;
+  }
+  
+  showResponseMessages(response){
+    if (response && response.message && response.message!=''){
+      if (response.message.constructor===Array){
+        var mess='';
+        $(response.message).each(function(ind,msg){
+          if (mess!=''){ mess+='<br>'; }
+          mess+=msg;
+        });
+        global.app.notify('danger','',mess);
+      }else{
+        global.app.notify('danger','',response.message);
+      }
+    }    
   }
   
   addNewBook(){

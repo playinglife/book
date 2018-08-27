@@ -9,7 +9,8 @@ class Book < ApplicationRecord
   validates_numericality_of :quantity, on: :update, message: 'Quantity must be a number less than 100', less_than: 100
 
   validates_associated :user
-  
+  validates_associated :images
+
   belongs_to  :user
   belongs_to  :author
   has_many    :images, dependent: :destroy, autosave: true

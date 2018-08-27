@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
 
-  respond_to :json
+  respond_to :json, :html
   
   def initialize
     super
@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def checkIfErrors(model) 
+  def onlyCheckErrors(model) 
     if (model.errors.messages.length>0)
       @success=false;
     end

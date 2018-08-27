@@ -65,109 +65,107 @@ class BooksController < ApplicationController
       end
 
       if (@success)
-        if (params[:title])
-          existing=current_user.books.find_by_title(params[:title])
-          if existing && existing.id!=params[:id].to_i
-            @success=false
-            self.addMessage("There is already a book with the same title.")
-          else
-            book.title=params[:title];
-          end
-        end
-        if (params[:description])
-          book.description=params[:description];
-        end
-        if (params[:author])
-          names=params[:author].split(" ")
-          if names.length>1
-            lastname=names[names.length-1]
-            names.pop
-            firstname=names.join(" ")
-          else
-            firstname=names[0]
-            lastname=''
-          end
-          #joined=params[:author].gsub(/\s+/, "")
-
-          author=Author.where("firstname=? AND lastname=?","#{firstname}","#{lastname}").first
-          #author=Author.where("CONCAT(firstname,lastname) = ?" , "#{joined}").first
-          if author.blank?
-            author=Author.new({
-              firstname: firstname,
-              lastname: lastname,
-              birthday: params[:birthday]
-            })
-            if author.valid?
-              author.save
-            else
-              self.checkErrors(author)
-            end
-          end
-
-          book.author=author
-        end
-        if (params[:quantity])
-          dif=book.available-(book.quantity-params[:quantity].to_i)
-          if dif>=0
-            book.quantity=params[:quantity];
-          else
-            @success=false
-            self.addMessage("You can't reduce the total amount to #{params[:quantity]} because there are #{dif.abs} books lended")
-          end
-        end
         if (params[:files])
           newImages=[]
           params[:files].map{ |file|
             image=Image.new
             image.name=file
-            book.images.push(image);
-            newImages.push(image)
+            image.book=book
+            if image.valid?
+              book.images.push(image);
+              newImages.push(image)
+            else
+              self.checkErrors(image)
+            end
           }
-        end
-        if (params[:cover])
+          @data['newImages']=newImages
+          if newImages.count>0
+            @success=true
+          end
+        else
+        
+          if (params[:title])
+            existing=current_user.books.find_by_title(params[:title])
+            if existing && existing.id!=params[:id].to_i
+              @success=false
+              self.addMessage("There is already a book with the same title.")
+            else
+              book.title=params[:title];
+            end
+          end
+          if (params[:description])
+            book.description=params[:description];
+          end
+          if (params[:author])
+            names=params[:author].split(" ")
+            if names.length>1
+              lastname=names[names.length-1]
+              names.pop
+              firstname=names.join(" ")
+            else
+              firstname=names[0]
+              lastname=''
+            end
+            #joined=params[:author].gsub(/\s+/, "")
 
-          cover=Image.find(params[:cover])
-          if (cover.book.user==current_user)
-
-            book.images.each { |item|
-              if item.id==params[:cover].to_i
-                item.cover=true
-              elsif item.cover
-                item.cover=false
+            author=Author.where("firstname=? AND lastname=?","#{firstname}","#{lastname}").first
+            #author=Author.where("CONCAT(firstname,lastname) = ?" , "#{joined}").first
+            if author.blank?
+              author=Author.new({
+                firstname: firstname,
+                lastname: lastname,
+                birthday: params[:birthday]
+              })
+              if author.valid?
+                author.save
+              else
+                self.checkErrors(author)
               end
-            }
+            end
 
-          else
-            @success=false
-            self.addMessage("You don't own this book so you can't change it.")
+            book.author=author
+          end
+          if (params[:quantity])
+            dif=book.available-(book.quantity-params[:quantity].to_i)
+            if dif>=0
+              book.quantity=params[:quantity];
+            else
+              @success=false
+              self.addMessage("You can't reduce the total amount to #{params[:quantity]} because there are #{dif.abs} books lended")
+            end
+          end
+          if (params[:cover])
+            cover=Image.find(params[:cover])
+            if (cover.book.user==current_user)
+
+              book.images.each { |item|
+                if item.id==params[:cover].to_i
+                  item.cover=true
+                elsif item.cover
+                  item.cover=false
+                end
+              }
+
+            else
+              @success=false
+              self.addMessage("You don't own this book so you can't change it.")
+            end
           end
         end
-      end
-
-      if (@success)
-        if (!params[:file])   #Only check validation errors if book is saved and not just an image upload for the book
+        if (@success)
           book.valid?
           self.checkErrors(book)
         end
-
         if @success
-          if (params[:file])
-            saved=book.save!(:validate => false)
-          else
-            saved=book.save()
-          end
-
-          if saved
-            if (params[:files]) 
-              @data['newImages']=newImages
-            end
-          else
+          saved=book.save     #saved=book.save!(:validate => false)
+          if !saved
             @success=false
             self.addMessage('Could not save data')
           end
         end
 
       end
+
       render json: {success: @success, message: @message, data: @data}, status: :ok    
     end
 

@@ -7,9 +7,9 @@
 #
 
 class Image < ApplicationRecord
-  validates :name, presence: {message: 'Name can\'t be empty'}, allow_nil: true
+  #validates :name, presence: {message: 'File name can\'t be empty'}, allow_nil: true
 
-  validates_associated :book
+  #validates_associated :book
   
   belongs_to :book
 

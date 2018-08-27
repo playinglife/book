@@ -49,7 +49,8 @@ class FileInput extends React.Component {
   handleDrop(e){
     e.preventDefault();
     e.stopPropagation();
-
+    $(this.uploadRef.current).removeClass('highlight');
+    
     var uploadObj = {
       target: e.dataTransfer
     };

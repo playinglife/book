@@ -427,7 +427,7 @@ body{
 }
 
 .file-container.highlight{
-  border:2px dashed $success;
+  background-color: rgba($primary, 0.2);
 }
 
 .file-input {

@@ -185,7 +185,14 @@ class NewBook extends React.Component{
                 for (var k=0;k<response.data.newImages.length;k++){
                   newList.push(response.data.newImages[k]);
                 }
-                global.app.notify('success','','Image succesfully added');
+                if (newList.length<fileList.length){
+                  var total=fileList.length;
+                  var saved=newList.length;
+                  global.app.showResponseMessages(response);
+                  global.app.notify('success','','From a total of '+total+(total>1 ? ' images' : ' image')+', '+saved+(saved>1 ? ' were' : 'was')+' saved and '+(total-saved)+' could not be saved.');
+                }else{
+                  global.app.notify('success','',(response.data.newImages.length>1 ? 'Images' : 'Image')+' succesfully added');
+                }
                 self.setState({images: newList})
               },
               callbackFailure:function(){},
