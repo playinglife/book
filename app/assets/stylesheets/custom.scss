@@ -238,6 +238,10 @@ body{
     height:45px;
     overflow:hidden;
 }
+#books .card .card-title.no-title{
+  font-weight: bold;
+}
+
 #books .card .card-body{
     overflow: hidden;
     padding:0.5em;

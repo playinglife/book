@@ -422,7 +422,7 @@ class Book extends React.Component {
               <img className="card-img-top" src={ this.getCoverUrl()+"?sync="+Date.now() } />
             </div>
             <div className="card-body">
-            <div className="card-title" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.book.title }>{ this.props.book.title }</div>
+            <div className={ this.props.book.title.length>0 ? "card-title" : "card-title no-title" } data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title={ this.props.book.title }>{ this.props.book.title.length>0 ? this.props.book.title : 'No Title'}</div>
             </div>
             { this.props.mine==true ?
               <button type="button" className="btn btn-danger w-30 card-action-delete pull-right" onClick={ this.deleteBook.bind(this) } data-toggle="confirmation" data-btn-ok-class="btn-success" data-btn-ok-icon-class="fa fa-check" data-btn-cancel-class="btn-danger" data-btn-cancel-icon-class="material-icons" data-title="Are you sure?">
