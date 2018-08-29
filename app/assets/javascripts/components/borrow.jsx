@@ -3,6 +3,7 @@ class BorrowBook extends React.Component{
         super(props);
         this.rootRef = React.createRef();
         this.borrowButton = React.createRef();
+        this.returnButton = React.createRef();
 
         if (this.props.data.book && typeof this.props.data.book.id!='undefined'){
             this.state={
@@ -20,6 +21,7 @@ class BorrowBook extends React.Component{
         
         this.getCoverUrl=this.getCoverUrl.bind(this);
         this.borrow=this.borrow.bind(this);
+        this.return=this.return.bind(this);
     }
 
     getCoverUrl(coverId){
@@ -84,42 +86,70 @@ class BorrowBook extends React.Component{
         });
     }
     
+    return(){
+        $(this.returnButton.current).prop('disabled', true);
+        var url=APIUrls['ReturnBook']+'/'+this.state.book.id;
+        var method='PUT';
+        var data={};
+        
+        var self=this;
+        global.fetch(url, method, data, {
+          callbackSuccess:function(){
+            global.app.notify('success','','Book succesfully returned');
+            $(self.borrowButton.current).prop('disabled', false);            
+            self.props.changeComponent('BorrowList',{mine: false});
+          },
+          callbackFailure:function(){
+            $(self.borrowButton.current).prop('disabled', false);
+          },
+          callbackError:function(){
+            $(self.borrowButton.current).prop('disabled', false); 
+          }
+        });
+    }
+    
     render(){
         return(
           <div className="center-panel">
             <div className="panel child-panel" ref={ this.rootRef }>
-            <h3>Borrow book</h3>
-            <form>
-                <div className="field">
-                  <div className="uploader" >
-                    <FilePreview existing={ this.getCoverUrl(this.state.cover) } onlyView={ true } ></FilePreview>
+              <h3>Borrow book</h3>
+              <form>
+                  <div className="field">
+                    <div className="uploader" >
+                      <FilePreview existing={ this.getCoverUrl(this.state.cover) } onlyView={ true } ></FilePreview>
+                    </div>
                   </div>
-                </div>
 
-                <div className="field">
-                    <label>Title</label><br/>
-                    <input className="form-control" id="title" type="text" maxLength="100" defaultValue={ this.state.book.title } disabled='true' />
-                </div>
-                <div className="field">
-                    <label>Author</label><br/>
-                    <input className="form-control typeahead" id="author" type="text" defaultValue={ this.state.book.author } disabled='true'/>
-                </div>
-                  
-                <div className="field">
-                    <label>Description</label><br/>
-                    <textarea className="form-control" id="description" defaultValue={ this.state.book.description } maxLength="1000" disabled='true'>
-                    </textarea>
-                </div>
-                { this.props.data.book.available==0 ?
-                "There are no more copies available." : null }
-                <hr/>
-                <div className="actions">
-                    <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
-                    { this.props.data.book.available>0 ?
-                    <input value="Borrow" className="btn btn-primary pull-right" type="button" onClick={ this.borrow } ref={ this.borrowButton }/>
-                    : null }
-                </div>
-            </form>
+                  <div className="field">
+                      <label>Title</label><br/>
+                      <input className="form-control" id="title" type="text" maxLength="100" defaultValue={ this.state.book.title } disabled='true' />
+                  </div>
+                  <div className="field">
+                      <label>Author</label><br/>
+                      <input className="form-control typeahead" id="author" type="text" defaultValue={ this.state.book.author } disabled='true'/>
+                  </div>
+
+                  <div className="field">
+                      <label>Description</label><br/>
+                      <textarea className="form-control" id="description" defaultValue={ this.state.book.description } maxLength="1000" disabled='true'>
+                      </textarea>
+                  </div>
+                  { this.props.data.book.available==0 ?
+                  "There are no more copies available." : null }
+                  <hr/>
+                  <div className="actions">
+                      <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
+                      { this.props.data.book.givenTaken==true ? 
+                        <input value="Return" className="btn btn-primary pull-right" type="button" onClick={ this.return } ref={ this.returnButton }/>
+                      :
+                        this.props.data.book.available>0 ?
+                          <input value="Borrow" className="btn btn-primary pull-right" type="button" onClick={ this.borrow } ref={ this.borrowButton }/>
+                        : 
+                          null
+                      }
+                  </div>
+              </form>
+              <div className="clearfix"></div>
             </div>
             
             <div className="panel child-panel">
@@ -129,6 +159,7 @@ class BorrowBook extends React.Component{
                     <ImageGallery images={ this.state.images } cover={ null } />
                   </div>
                 </form>
+                <div className="clearfix"></div>
             </div>
           </div>
         );

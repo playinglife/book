@@ -2,6 +2,8 @@ $primary: rgb(192,135,62);
 $danger: rgb(90,39,8);
 $success: rgb(216,183,114);
 
+$phone: 600px;
+
 /*===========================
     Bootstrap override
 ===========================*/
@@ -105,6 +107,7 @@ body {
     width: 200px;
     height: 100%;
     background-color: rgba(0,0,0,0.5);
+    z-index:2;
 }
 #container > div:nth-child(2) {
     margin-left:200px;
@@ -116,6 +119,45 @@ body {
     top:0px;
     right:0px;
     bottom:0px;
+    z-index:1;
+}
+#container > div:nth-child(3) {
+    position:fixed;
+    left: 0px;
+    top: 0px;
+    width: 60px;
+    height: 60px;
+    color: white;
+    line-height: 60px;
+    font-size: 1.3rem;    
+    i{
+      margin-left: 21px;
+    }
+    cursor: pointer;
+    display: none;
+    z-index:3;
+}
+
+@media only screen and (min-width: $phone+1) {
+  display: none;
+}
+
+@media only screen and (max-width: $phone) {
+  #container > div:first-child {
+    display: none;
+  }
+  #container > div:first-child.show {
+    display: block;
+  }
+  #container > div:nth-child(2) {
+    margin-left:0px;
+  }
+  #container > div:nth-child(3) {
+    display: block;
+  }
+  #container > div:nth-child(3).show {
+    background-color: rgba(0,0,0,0.5);
+  }
 }
 
 /* Sidebar Styles */
@@ -184,6 +226,11 @@ body {
   background: none;
 }
 
+@media only screen and (max-width: 600px) {
+  .sidebar-nav {
+    margin-top:60px;
+  }
+}
 
 /*Background image*/
 html{
@@ -265,6 +312,19 @@ body{
     }
 }
 
+@media only screen and (max-width: $phone) {
+  #books{
+    width:500px;
+    margin: 0 auto;
+  }
+}
+@media only screen and (max-width: 530px) {
+  #books{
+    width:250px;
+    margin: 0 auto;
+    padding:10px;
+  }
+}
 
 /*CSS only for devise*/
 #center-devise{
@@ -281,7 +341,16 @@ body{
 #center-devise input[type='password'], #center-devise input[type='email'], #center-devise input[type='button'], #center-devise input[type='submit']{
     width: 100%;
 }
-
+@media only screen and (max-width: $phone) {
+  #center-devise{
+    width:100%;
+    left:0px;
+    top:0px;
+    right:0px;
+    bottom:0px;
+    margin:0;
+  }
+}
 
 
 /*Loader*/
@@ -339,33 +408,49 @@ body{
 
 
 /*Forms centered in content area*/
-    .center-form{
-        background-color: rgba(255, 255, 255, 0.7);
-        border: 1px solid #fff;
-        padding: 10px;
-        width: 26%;
-        position: absolute;
-        left: 50%;
-        top: 10%;
-        margin-left: calc(-13%);
-    }
+.center-form{
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #fff;
+    padding: 10px;
+    width: 26%;
+    position: absolute;
+    left: 50%;
+    top: 10%;
+    margin-left: calc(-13%);
+}
 
-    .center-panel{
-      display: table;
-      position: absolute;
-      width: 76%;
-      left: 50%;
-      margin-left: -38%;
-      padding: 25px;
-      border-spacing: 10px;      
-    }
+.center-panel{
+  display: table;
+  position: absolute;
+  width: 76%;
+  left: 50%;
+  margin-left: -38%;
+  padding: 25px;
+  border-spacing: 10px;      
+}
+.child-panel{
+    background-color: rgba(255, 255, 255, 0.7);
+    border: 1px solid #fff;
+    padding: 10px;
+    width: 50%;
+    display: table-cell;
+}
+
+@media only screen and (max-width: 1024px) {
+  .center-panel{
+    width:100%;
+    left:0px;
+    margin-left:0px;
     .child-panel{
-        background-color: rgba(255, 255, 255, 0.7);
-        border: 1px solid #fff;
-        padding: 10px;
-        width: 50%;
-        display: table-cell;
+      display: block;
+      width:100%;
     }
+    .child-panel:not(:first-child){
+      margin-top:10px;
+    }
+  }
+  
+}
     
 /*Change font for all*/
 body{
@@ -558,14 +643,16 @@ body{
   top:-1px;
   right:18px;
   width:500px;
-  height:120px;
+  //height:120px;
   padding:10px;
   border-radius: 0 0 0 5px;
   transition: top 0.5s ease-in-out;
   i{
     cursor: pointer;
   }
-  
+  button{
+    white-space: normal;
+  }
   .options{
     width:100%;
   }
@@ -577,7 +664,7 @@ body{
 }
 
 .search-box-hidden{
-  top:-120px;
+  top:-150px;
   transition: top 0.5s ease-in-out;
 }
 
@@ -612,6 +699,14 @@ body{
     0% {background:#e9ecef;color: #495057;}
     50% {background:$primary;color: #fff;}
     100% {background:e9ecef;color: #495057;}
+}
+
+@media only screen and (max-width: $phone) {
+  .search-box:first-child{
+    width: auto;
+    left:60px;
+    right:0px;
+  }
 }
 
 

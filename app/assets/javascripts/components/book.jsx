@@ -258,51 +258,52 @@ class NewBook extends React.Component{
         return(
           <div className="center-panel">
             <div className="panel child-panel" ref={ this.rootRef }>
-            <h3>Edit book</h3>
-            <form>
-                <div className="field">
-                  <div className="uploader" >
-                    <FilePreview existing={ this.getCoverUrl(this.state.cover) } onlyView={ true } ></FilePreview>
+              <h3>Edit book</h3>
+              <form>
+                  <div className="field">
+                    <div className="uploader" >
+                      <FilePreview existing={ this.getCoverUrl(this.state.cover) } onlyView={ true } ></FilePreview>
+                    </div>
                   </div>
-                </div>
 
-                <div className="field">
-                    <label>Title</label><br/>
-                    <input className="form-control" id="title" type="text" maxLength="100" defaultValue={ !this.newBook ? this.state.book.title : "" } />
-                </div>
-                <div className="field">
-                    <label>Author</label><br/>
-                    <input id="author_id" type="hidden" />
-                    <input className="form-control typeahead" id="author" type="text" defaultValue={ !this.newBook ? this.state.book.author : "" }/>
-                </div>
+                  <div className="field">
+                      <label>Title</label><br/>
+                      <input className="form-control" id="title" type="text" maxLength="100" defaultValue={ !this.newBook ? this.state.book.title : "" } />
+                  </div>
+                  <div className="field">
+                      <label>Author</label><br/>
+                      <input id="author_id" type="hidden" />
+                      <input className="form-control typeahead" id="author" type="text" defaultValue={ !this.newBook ? this.state.book.author : "" }/>
+                  </div>
 
-                <div className="field" id='authorBirthdayGroup'>
-                  <label>New author's birthday</label><br/>
-                    <div className="form-group">
-                      <div className="input-group date" id="authorBirthday" data-target-input="nearest">
-                          <input type="text" className="form-control datetimepicker-input" data-target="#authorBirthday" onKeyDown={ this.cancelKeys }/>
-                          <div className="input-group-append btn btn-primary" data-target="#authorBirthday" data-toggle="datetimepicker">
-                              <div className=""><i className="fa fa-calendar"></i></div>
-                          </div>
-                      </div>
-                  </div>                        
-                </div>
-                  
-                <div className="field">
-                    <label>Description</label><br/>
-                    <textarea className="form-control" id="description" defaultValue={ !this.newBook ? this.state.book.description : "" } maxLength="1000">
-                    </textarea>
-                </div>
-                <div className="field">
-                    <label>Quantity</label><br/>
-                    <input className="form-control" id="quantity" defaultValue={ !this.newBook ? this.state.book.quantity : "" } />
-                </div>
-                <hr/>
-                <div className="actions">
-                    <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
-                    { !this.newBook ? <input value="Save" className="btn btn-primary pull-right" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/> : '' }
-                </div>
-            </form>
+                  <div className="field" id='authorBirthdayGroup'>
+                    <label>New author's birthday</label><br/>
+                      <div className="form-group">
+                        <div className="input-group date" id="authorBirthday" data-target-input="nearest">
+                            <input type="text" className="form-control datetimepicker-input" data-target="#authorBirthday" onKeyDown={ this.cancelKeys }/>
+                            <div className="input-group-append btn btn-primary" data-target="#authorBirthday" data-toggle="datetimepicker">
+                                <div className=""><i className="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>                        
+                  </div>
+
+                  <div className="field">
+                      <label>Description</label><br/>
+                      <textarea className="form-control" id="description" defaultValue={ !this.newBook ? this.state.book.description : "" } maxLength="1000">
+                      </textarea>
+                  </div>
+                  <div className="field">
+                      <label>Quantity</label><br/>
+                      <input className="form-control" id="quantity" defaultValue={ !this.newBook ? this.state.book.quantity : "" } />
+                  </div>
+                  <hr/>
+                  <div className="actions">
+                      <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
+                      { !this.newBook ? <input value="Save" className="btn btn-primary pull-right" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/> : '' }
+                  </div>
+              </form>
+              <div className="clearfix"></div>
             </div>
             
             <div className="panel child-panel">
@@ -320,6 +321,7 @@ class NewBook extends React.Component{
                   </div>
                 </form>
                : '' }
+              <div className="clearfix"></div>
             </div>
           </div>
         );

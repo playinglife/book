@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   
   get     'books/others',             to:   'books#others'
   put     'books/borrow/:id',         to:   'books#borrow'
+  put     'books/return/:id',         to:   'books#return'
 
   devise_for :users, :controllers => {sessions: 'sessions', registrations: 'registrations', passwords: 'passwords'}
   devise_for :admin_users, ActiveAdmin::Devise.config

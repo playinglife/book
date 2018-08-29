@@ -87,11 +87,11 @@ class Search extends React.Component{
             </div>
           </div>
           
-<div className="btn-group options" role="group" data-toggle="buttons">
-  <button data-option="All" type="button" className={ "btn btn-secondary col-sm-4 "+(this.state.option=='All' ? 'active' : '') } onClick={ this.select }>All</button>
-  <button data-option="GivenTaken" type="button" className={ "btn btn-secondary col-sm-4 "+(this.state.option=='GivenTaken' ? 'active' : '') } onClick={ this.select }>{ this.props.mine==true ? 'Lended' : 'Borrowed' }</button>
-  <button data-option="NotGivenTaken" type="button" className={ "btn btn-secondary col-sm-4 "+(this.state.option=='NotGivenTaken' ? 'active' : '') } onClick={ this.select }>{ this.props.mine==true ? 'Not Lended' : 'Not Borrowed' }</button>
-</div>
+          <div className="btn-group options" role="group" data-toggle="buttons">
+            <button data-option="All" type="button" className={ "btn btn-secondary col-sm-4 "+(this.state.option=='All' ? 'active' : '') } onClick={ this.select }>All</button>
+            <button data-option="GivenTaken" type="button" className={ "btn btn-secondary col-sm-4 "+(this.state.option=='GivenTaken' ? 'active' : '') } onClick={ this.select }>{ this.props.mine==true ? 'Lended' : 'Borrowed' }</button>
+            <button data-option="NotGivenTaken" type="button" className={ "btn btn-secondary col-sm-4 "+(this.state.option=='NotGivenTaken' ? 'active' : '') } onClick={ this.select }>{ this.props.mine==true ? 'Not Lended' : 'Not Borrowed' }</button>
+          </div>
 
         </div>
         <div className={ this.props.showFilter==false ? "panel search-box search-box-show" : "panel search-box search-box-hidden search-box-show" }>

@@ -196,7 +196,7 @@ class BooksController < ApplicationController
       @user=current_user
       @data=[];
 
-      User.includes(:books, :books => [:author, :images]).where("id<>?",@user.id).all.each{ |user| 
+      User.includes(:books, :books => [:author, :images, :loans]).where("id<>?",@user.id).all.each{ |user| 
         if !user.books.empty? then
           user.books.each{ |book| 
             if !book.images.empty? then
@@ -260,6 +260,38 @@ class BooksController < ApplicationController
           end
         end
       else
+        ActiveRecord::Rollback
+      end
+    end
+
+    render json: {success: @success, message: @message, data: @data}, status: :ok
+  end
+
+  def return
+    user=current_user
+    loan=Loan.where(:book_id=> params[:id], :user=> user, :returned=> false).first;
+    if (!loan.present?)
+      @success=false
+      self.addMessage('You have not borrowed this book')
+    end
+
+    ActiveRecord::Base.transaction do
+      bookToReturn=Book.find(params[:id]);
+
+      if (@success==true)
+        loan.returned=true
+
+        loan.valid?
+        self.checkErrors(loan)
+        if (@success==true)
+          loan.save
+
+          bookToReturn.available+=1
+          bookToReturn.save
+        end
+      end
+
+      if (@success==false)
         ActiveRecord::Rollback
       end
     end

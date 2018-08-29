@@ -12,6 +12,7 @@ APIUrls['AuthorTypeahead']=window.origin+'/authors/typeahead';
 
 APIUrls['BookOthers']=window.origin+'/books/others';
 APIUrls['BorrowBook']=window.origin+'/books/borrow';
+APIUrls['ReturnBook']=window.origin+'/books/return';
 
 var global={
     app: null   /*Will be set in application didMount event*/
@@ -47,12 +48,16 @@ class Application extends React.Component {
       data: this.props.data,
       component: this.props.component!==undefined?this.props.component:null,
       loggedIn: this.props.loggedIn,
-      menuActive: 1
+      menuActive: 1,
     }
     
+    this.rootRef = React.createRef();
+    this.menuRef = React.createRef();
+    this.burgerRef= React.createRef();
+      
     this.unlockToken=this.props.unlock_token;
     this.resetPasswordToken=this.props.reset_password_token;
-    
+    this.showMenu=false;
     this.firstRun=true;
     this.menuOrder={BookList: 1,BorrowList: 2};    
     
@@ -61,14 +66,17 @@ class Application extends React.Component {
     this.notify.bind(this);
     this.login.bind(this);
     this.cancel.bind(this);
-
     this.addNewBook=this.addNewBook.bind(this);
+    this.toggleMenu=this.toggleMenu.bind(this);
+    this.showResponseMessages=this.showResponseMessages.bind(this);
+    this.handleOutsideClick=this.handleOutsideClick.bind(this);
     
     global.app=this;
     global.csrf=$('meta[name="csrf-token"]').attr('content');
   }
 
   componentWillMount(){
+    var self=this;
     global.fetch=function(url, method, data, passedSettings){
       var headers;
       var settings={
@@ -109,7 +117,7 @@ class Application extends React.Component {
           if (response && response.message=='redirect'){
             window.location.replace(response.data);
           }else{
-            this.showResponseMessages(response);
+            self.showResponseMessages(response);
             if (typeof settings.callbackFailure=='function') { settings.callbackFailure(response, headers); } 
           }
         }
@@ -133,6 +141,13 @@ class Application extends React.Component {
   componentDidMount() {
     this.unlockToken=null;
     this.resetPasswordToken=null;
+    document.addEventListener('click', this.handleOutsideClick, false);
+  }
+  
+  toggleMenu(){
+    this.showMenu=!this.showMenu;
+    $(this.menuRef.current).toggleClass('show');
+    $(this.burgerRef.current).toggleClass('show');
   }
   
   showResponseMessages(response){
@@ -205,7 +220,7 @@ class Application extends React.Component {
 		from: "top",
 		align: "right"
 	},
-	offset: 20,
+	offset: 0,
 	spacing: 1,
 	z_index: 1031,
 	delay: 5000,
@@ -249,33 +264,46 @@ class Application extends React.Component {
     });
   }
   
+  handleOutsideClick(e){
+    if (/*(this.menuRef.current.contains(e.target) || */this.burgerRef.current.contains(e.target)) {
+      return;
+    }
+    if (this.showMenu==true){
+      this.toggleMenu();
+    }
+  }
+  
   render() {
     if (this.state.loggedIn){
       return (
         <div id="container" onDrop={ this.cancelOnDrop.bind(this) } onDragOver={ this.cancelOnDrop.bind(this) } >
-            <div>
-                <ul className="sidebar-nav">
-                    <li className="sidebar-brand">
-                        <img src={this.props.logo} />
-                        <a href='' onClick={ this.changeComponent.bind(this, 'NewBook', {}) }>
-                            <i className="fa fa-plus add-new-book-button"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a className={ this.state.menuActive==this.menuOrder['BookList'] ? "active" : "" } href='' onClick={ this.changeComponent.bind(this, 'BookList', {mine: true}) }>My Books</a>
-                    </li>
-                    <li>
-                        <a className={ this.state.menuActive==this.menuOrder['BorrowList'] ? "active" : "" } href='' onClick={ this.changeComponent.bind(this, 'BorrowList', {mine: false}) }>My friends' books</a>
-                    </li>
-                    <li>
-                    <a rel="nofollow" href="" onClick={ this.logout.bind(this) }>Sign out</a>
-                    </li>
-                </ul>
+            <div ref={ this.menuRef } className={ this.showMenu ? "show" : "" }>
+              <ul className="sidebar-nav">
+                  <li className="sidebar-brand">
+                      <img src={this.props.logo} />
+                      <a href='' onClick={ this.changeComponent.bind(this, 'NewBook', {}) }>
+                          <i className="fa fa-plus add-new-book-button"></i>
+                      </a>
+                  </li>
+                  <li>
+                      <a className={ this.state.menuActive==this.menuOrder['BookList'] ? "active" : "" } href='' onClick={ this.changeComponent.bind(this, 'BookList', {mine: true}) }>My Books</a>
+                  </li>
+                  <li>
+                      <a className={ this.state.menuActive==this.menuOrder['BorrowList'] ? "active" : "" } href='' onClick={ this.changeComponent.bind(this, 'BorrowList', {mine: false}) }>My friends' books</a>
+                  </li>
+                  <li>
+                  <a rel="nofollow" href="" onClick={ this.logout.bind(this) }>Sign out</a>
+                  </li>
+              </ul>
             </div>
-            
             <div id="the-content">
             { this.state.component!==null ? this.loadComponent() : null }
             </div>
+
+            <div ref={ this.burgerRef } className={ this.showMenu ? "" : "show" } onClick={ this.toggleMenu }>
+              <i className="fa fa-bars" data-toggle="tooltip" title="Show menu"></i>
+            </div>
+
             <Loader />
             <div className=".notifications.top-right"></div>
             <ModalWin />
