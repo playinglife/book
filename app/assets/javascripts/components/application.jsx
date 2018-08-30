@@ -256,6 +256,7 @@ class Application extends React.Component {
       callbackFailure:function(response, headers){
         global.csrf=headers.get('Toki')
         self.setState({loggedIn: false});
+        self.destroy();
       },
       callbackError:function(error, headers){
         global.csrf=headers.get('Toki')

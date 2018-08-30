@@ -99,7 +99,7 @@ class FileInput extends React.Component {
       <div ref={ this.uploadRef } className= 'file-container ' onDrop={ this.handleDrop.bind(this) } onDragEnter={ this.handleDragEnter.bind(this) }
         onDragOver={ this.handleDragOver.bind(this) } onDragLeave={ this.handleDragLeave.bind(this) }>
           <h3>Click or drop an image</h3>
-          <input className={ "file-input " + classNames } name="upload" type="file" onChange={ this.handleChange.bind(this) } />
+          <input className={ "file-input " + classNames } name="upload" type="file" multiple="multiple" onChange={ this.handleChange.bind(this) } />
       </div>
     )
   }
