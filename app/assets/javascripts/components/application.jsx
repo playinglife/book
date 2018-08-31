@@ -13,6 +13,7 @@ APIUrls['AuthorTypeahead']=window.origin+'/authors/typeahead';
 APIUrls['BookOthers']=window.origin+'/books/others';
 APIUrls['BorrowBook']=window.origin+'/books/borrow';
 APIUrls['ReturnBook']=window.origin+'/books/return';
+APIUrls['DuplicateBook']=window.origin+'/books/duplicate';
 
 var global={
     app: null   /*Will be set in application didMount event*/
@@ -111,6 +112,7 @@ class Application extends React.Component {
       .then(response => { headers=response.headers; return response.json(); })
       .then(response =>{
         if (settings.lock){ global.loader.hideLoader(); }
+        if (typeof settings.callbackAll=='function') { settings.callbackAll(response, headers); } 
         if (response && response.success==true){
           if (typeof settings.callbackSuccess=='function') { settings.callbackSuccess(response, headers); } 
         }else{

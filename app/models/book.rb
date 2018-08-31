@@ -6,8 +6,6 @@ class Book < ApplicationRecord
   validates :description, presence: {message: 'Please enter a description'}, allow_nil: false, allow_blank: false
   validates :description, length: { in: 10..1000 , message:'Description  must be between 10 and 1000 characters long'}, allow_nil: false, allow_blank: false
 
-  validates_numericality_of :quantity, on: :update, message: 'Quantity must be a number less than 100', less_than: 100
-
   validates_associated :user
   validates_associated :images
 

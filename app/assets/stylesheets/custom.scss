@@ -20,6 +20,19 @@ $phone: 600px;
     background-color: darken( $primary, 5% );
     border-color: darken( $primary, 5% );
 }
+.btn-primary.disabled, .btn-primary:disabled {
+    background-color: lighten( $primary, 50% );
+    border-color: lighten( $primary, 50% );
+    color: gray;
+}
+
+
+.btn-secondary.disabled, .btn-secondary:disabled {
+    background-color: lighten( $primary, 50% );
+    border-color: lighten( $primary, 50% );
+    color: gray;
+}
+
 
 .btn-primary:focus, .btn-primary.focus, 
 .btn-primary:not(:disabled):not(.disabled):active:focus, 
@@ -48,6 +61,12 @@ $phone: 600px;
 .show > .btn-success.dropdown-toggle:focus {
     box-shadow: 0 0 0 0.1rem lighten( $primary, 25% );
 }
+.btn-success.disabled, .btn-success:disabled {
+    background-color: lighten( $primary, 50% );
+    border-color: lighten( $primary, 50% );
+    color: gray;
+}
+
 
 .btn-danger, 
 .btn-danger:visited,
@@ -68,6 +87,11 @@ $phone: 600px;
 .btn-danger:not(:disabled):not(.disabled).active:focus, 
 .show > .btn-danger.dropdown-toggle:focus {
     box-shadow: 0 0 0 0.1rem lighten( $primary, 25% );
+}
+.btn-danger.disabled, .btn-danger:disabled {
+    background-color: lighten( $primary, 50% );
+    border-color: lighten( $primary, 50% );
+    color: gray;
 }
 
 .form-control:focus {
@@ -91,7 +115,12 @@ h2{
 h3{
     font-size: 1.25em;
 }
-
+@media only screen and (max-width: $phone) {
+  input[type=button].maxer, .btn-group.maxer{
+    width: 100%;
+    margin-top: 5px;
+  }
+}
 
 
 

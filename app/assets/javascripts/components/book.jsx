@@ -4,7 +4,6 @@ class NewBook extends React.Component{
         super(props);
         this.rootRef = React.createRef();
         this.fileInput = React.createRef();
-        this.saveButton = React.createRef();
 
         if (this.props.data.book && typeof this.props.data.book.id!='undefined'){
             this.newBook=false;
@@ -27,6 +26,9 @@ class NewBook extends React.Component{
         this.getCoverUrl=this.getCoverUrl.bind(this);
         this.setToCover=this.setToCover.bind(this);
         this.deleteImage=this.deleteImage.bind(this);
+        this.duplicate=this.duplicate.bind(this);
+        this.enableButtons=this.enableButtons.bind(this);
+        this.disableButtons=this.disableButtons.bind(this);
     }
 
     getCoverUrl(coverId){
@@ -70,62 +72,64 @@ class NewBook extends React.Component{
     componentDidMount(){
       var self=this;
       if (this.newBook){
-        $(this.saveButton.current).prop('disabled', true);
+        self.disableButtons();
         var self=this;
         global.fetch(APIUrls['Book'], 'POST', {}, {
           callbackSuccess:function(response){
             self.newBook=false;
             self.setState({book: response.data, images: [], cover: null});
           },
-          callbackFailure:function(){
-
-          },
-          callbackError:function(){
-
+          callbackFailure:function(){},
+          callbackError:function(){},
+          callbackAll:function(){
+            self.enableButtons();
           }
         });
       }
       
-      if (!this.newBook){
-        $(this.rootRef.current).find('#author').on('keydown',function(){
-          self.newAuthor=true;
-          $(self.rootRef.current).find('#authorBirthdayGroup').show();
-        });
-        
-        $(this.rootRef.current).find('#author').on('typeahead:selected', function(ev, suggestion) {
-          $(self.rootRef.current).find('#author_id').val(suggestion.id);
-          self.newAuthor=false;
-          $(self.rootRef.current).find('#authorBirthdayGroup').hide();
-        }).typeahead(
-          {},{
-            display: 'value',
-            source: function(query, result){
-              global.fetch(APIUrls['AuthorTypeahead']+'/'+query, 'GET', null, {
-                lock: false,
-                callbackSuccess:function(response){
-                  let list=[];
-                  list=$.map(response.data, function(item){
-                    item.value=item.firstname+' '+item.lastname;
-                    return item;
-                  })
-                  result(list);
-                },
-                callbackFailure:function(){
-                },
-                callbackError:function(){
-                }
-              });
 
-            }
-          });
-          
-        $(this.rootRef.current).find('#authorBirthday').datetimepicker({
-          format: 'MM/DD/YYYY',
-          viewMode: 'years'
+      $(this.rootRef.current).find('#author').on('keydown',function(){
+        self.newAuthor=true;
+        $(self.rootRef.current).find('#authorBirthdayGroup').show();
+      });
+
+      $(this.rootRef.current).find('#author').on('typeahead:selected', function(ev, suggestion) {
+        $(self.rootRef.current).find('#author_id').val(suggestion.id);
+        self.newAuthor=false;
+        $(self.rootRef.current).find('#authorBirthdayGroup').hide();
+      }).typeahead(
+        {},{
+          display: 'value',
+          source: function(query, result){
+            global.fetch(APIUrls['AuthorTypeahead']+'/'+query, 'GET', null, {
+              lock: false,
+              callbackSuccess:function(response){
+                let list=[];
+                list=$.map(response.data, function(item){
+                  item.value=item.firstname+' '+item.lastname;
+                  return item;
+                })
+                result(list);
+              },
+              callbackFailure:function(){},
+              callbackError:function(){}
+            });
+
+          }
         });
-      }
+
+      $(this.rootRef.current).find('#authorBirthday').datetimepicker({
+        format: 'MM/DD/YYYY',
+        viewMode: 'years'
+      });
     }
 
+    disableButtons(){
+      $(this.rootRef.current).find('input[type=button]').prop('disabled', true);
+    }
+    enableButtons(){
+      $(this.rootRef.current).find('input[type=button]').prop('disabled', false);
+    }
     setToCover(id){
       this.setState({cover: id});
     }
@@ -148,10 +152,8 @@ class NewBook extends React.Component{
               self.setState({images:newList})
           }
         },
-        callbackFailure:function(){
-        },
-        callbackError:function(){
-        }
+        callbackFailure:function(){},
+        callbackError:function(){}
       });          
     }
 
@@ -209,7 +211,7 @@ class NewBook extends React.Component{
     }
 
     saveBook(){
-        $(this.saveButton.current).prop('disabled', true);
+        this.disableButtons();
         var url=APIUrls['Book']+'/'+this.state.book.id;
         var method='PUT';
         
@@ -224,7 +226,6 @@ class NewBook extends React.Component{
         //data.append('birthday', root.find('#authorBirthday').val());
         data.append('birthday', '10/10/1980');
         
-        data.append('quantity', root.find('#quantity').val());
         if (this.state.cover!=null){
           data.append('cover', this.state.cover);
         }
@@ -237,16 +238,35 @@ class NewBook extends React.Component{
             obj.title=data.title;
             obj.description=data.description;
             self.setState({book: obj});
-            $(self.saveButton.current).prop('disabled', false);
             self.props.changeComponent('BookList',{mine: true});
           },
-          callbackFailure:function(){
-            $(self.saveButton.current).prop('disabled', false);
-          },
-          callbackError:function(){
-            $(self.saveButton.current).prop('disabled', false); 
+          callbackFailure:function(){},
+          callbackError:function(){},
+          callbackAll:function(){
+            self.enableButtons();
           }
         });
+    }
+    
+    duplicate(){
+      this.disableButtons();
+      var url=APIUrls['DuplicateBook']+'/'+this.state.book.id;
+      var method='POST';
+
+      var root=$(this.rootRef.current);
+
+      var self=this;
+      global.fetch(url, method, {}, {
+        callbackSuccess:function(response){
+          global.app.notify('success','','Book succesfully duplicated.<br>You are now editing the new copy of the book.');
+          self.props.changeComponent('NewBook',{book: response.data});
+        },
+        callbackFailure:function(){},
+        callbackError:function(){},
+        callbackAll:function(){
+          self.enableButtons();
+        }
+      });    
     }
     
     cancelKeys(event){
@@ -293,14 +313,13 @@ class NewBook extends React.Component{
                       <textarea className="form-control" id="description" defaultValue={ !this.newBook ? this.state.book.description : "" } maxLength="1000">
                       </textarea>
                   </div>
-                  <div className="field">
-                      <label>Quantity</label><br/>
-                      <input className="form-control" id="quantity" defaultValue={ !this.newBook ? this.state.book.quantity : "" } />
-                  </div>
                   <hr/>
                   <div className="actions">
-                      <input value="Cancel" className="btn btn-primary pull-left" type="button" onClick={ this.props.cancel } />
-                      { !this.newBook ? <input value="Save" className="btn btn-primary pull-right" type="button" onClick={ this.saveBook.bind(this) } ref={ this.saveButton }/> : '' }
+                    <input value="Cancel" className="btn btn-secondary pull-left maxer" type="button" onClick={ this.props.cancel } />
+                    <div className="btn-group pull-right maxer" role="group" aria-label="Basic example">
+                      <input value="Duplicate" className="btn btn-primary maxer" type="button" onClick={ this.duplicate } data-toggle="confirmation" data-title="Please confirm you want to duplicate this book"/>
+                      { !this.newBook ? <input value="Save" className="btn btn-primary maxer" type="button" onClick={ this.saveBook.bind(this) } /> : '' }
+                    </div>
                   </div>
               </form>
               <div className="clearfix"></div>
@@ -414,11 +433,17 @@ class Book extends React.Component {
     if (this.filteredOut==false){
       return (
           <div className="panel card" ref={ this.rootRef } onClick={ this.editOrBorrowBook }>
-            { this.props.mine==false && this.props.book.available==0 ?
-              <div className="corner-ribbon red shadow" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title="No copies available">
-                <i className="fa fa-ban">
-                </i>
-              </div>
+            { this.props.book.givenTaken==true ?
+              this.props.mine==false ?
+                <div className="corner-ribbon red shadow" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title="Not available">
+                  <i className="fa fa-ban">
+                  </i>
+                </div>
+              :
+                <div className="corner-ribbon blue shadow" data-toggle="tooltip" data-placement="bottom" data-trigger="hover" title="Lended">
+                  <i className="fa fa-user">
+                  </i>
+                </div>
             : null }
             <div className="image">
               <img className="card-img-top" src={ this.getCoverUrl()+"?sync="+Date.now() } />
@@ -514,11 +539,9 @@ class BookList extends React.Component {
         self.setState({books:response.data});
       },
       callbackFailure:function(){
-        $(self.saveButton.current).prop('disabled', false);
         self.setState({books:null});
       },
       callbackError:function(){
-        $(self.saveButton.current).prop('disabled', false); 
         self.setState({books:null});
       }
     });        
@@ -527,7 +550,6 @@ class BookList extends React.Component {
   deleteBook(bookId){
     var self=this;
     var data={};
-    
     global.fetch(APIUrls['Book']+'/'+bookId, 'DELETE', null, {
       callbackSuccess:function(){
         var index=null;
@@ -539,12 +561,8 @@ class BookList extends React.Component {
         }
         global.app.notify('success','','Book deleted succesfully.');
       },
-      callbackFailure:function(){
-        $(self.saveButton.current).prop('disabled', false);
-      },
-      callbackError:function(){
-        $(self.saveButton.current).prop('disabled', false); 
-      }
+      callbackFailure:function(){},
+      callbackError:function(){}
     });    
   }
 

@@ -6,10 +6,8 @@
     global.helpers.isEqual = function (value, other) {
       // Get the value type
       var type = Object.prototype.toString.call(value);
-
       // If the two objects are not the same type, return false
       if (type !== Object.prototype.toString.call(other)) return false;
-
       // If items are not an object or array, return false
       if (['[object Array]', '[object Object]'].indexOf(type) < 0) return false;
 
@@ -20,21 +18,14 @@
 
       // Compare two items
       var compare = function (item1, item2) {
-
         // Get the object type
         var itemType = Object.prototype.toString.call(item1);
-
         // If an object or array, compare recursively
         if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
-          if (!isEqual(item1, item2)) return false;
-        }
-
-        // Otherwise, do a simple comparison
-        else {
-
+          if (!global.helpers.isEqual(item1, item2)) return false;
+        } else { // Otherwise, do a simple comparison
           // If the two items are not the same type, return false
           if (itemType !== Object.prototype.toString.call(item2)) return false;
-
           // Else if it's a function, convert to a string and compare
           // Otherwise, just compare
           if (itemType === '[object Function]') {
@@ -42,7 +33,6 @@
           } else {
             if (item1 !== item2) return false;
           }
-
         }
       };
 

@@ -85,3 +85,4 @@ gem 'bootstrap-typeahead-rails'
 gem 'momentjs-rails', '>= 2.9.0'
 gem 'bootstrap4-datetime-picker-rails'
 gem 'whenever', require: false
+gem 'webpacker', '~> 3.5'

@@ -25,8 +25,6 @@ class BooksController < ApplicationController
         description: book.description,
         author: book.author.blank? ? nil : "#{book.author.firstname} #{book.author.lastname}",
         images: book.images,
-        quantity: book.quantity,
-        available: book.available,
         cover: cover,
         givenTaken: book.loans.where(returned: false).count>0 ? true : false
       });
@@ -125,15 +123,6 @@ class BooksController < ApplicationController
 
             book.author=author
           end
-          if (params[:quantity])
-            dif=book.available-(book.quantity-params[:quantity].to_i)
-            if dif>=0
-              book.quantity=params[:quantity];
-            else
-              @success=false
-              self.addMessage("You can't reduce the total amount to #{params[:quantity]} because there are #{dif.abs} books lended")
-            end
-          end
           if (params[:cover])
             cover=Image.find(params[:cover])
             if (cover.book.user==current_user)
@@ -152,12 +141,17 @@ class BooksController < ApplicationController
             end
           end
         end
-        if (@success)
+
+        if (@success && !params[:files])
           book.valid?
           self.checkErrors(book)
         end
         if @success
-          saved=book.save     #saved=book.save!(:validate => false)
+          if params[:files]
+            saved=book.save!(:validate => false)
+          else
+            saved=book.save
+          end
           if !saved
             @success=false
             self.addMessage('Could not save data')
@@ -172,7 +166,7 @@ class BooksController < ApplicationController
     def destroy
       book=Book.find(params[:id])
       if book.user==current_user
-          book.delete
+          book.destroy
       else
           @success=false
           self.addMessage("You don't own this boo so you can't delete it.")
@@ -216,8 +210,6 @@ class BooksController < ApplicationController
               description: book.description,
               author: book.author.blank? ? nil : "#{book.author.firstname} #{book.author.lastname}",
               images: book.images,
-              quantity: book.quantity,
-              available: book.available,
               cover: cover,
               givenTaken: book.loans.where(returned: false).count>0 ? true : false
             });
@@ -229,17 +221,21 @@ class BooksController < ApplicationController
 
   def borrow
     user=current_user
-    loan=Loan.where(:book_id=> params[:id], :user=> user, :returned=> false).first;
+    loan=Loan.where(:book_id=> params[:id], :returned=> false).first;
     if (loan.present?)
       @success=false
-      self.addMessage('You have already borrowed this book')
+      if loan.user==user
+        self.addMessage('You have already borrowed this book')
+      else
+        self.addMessage('This book is not available')
+      end
     end
 
     ActiveRecord::Base.transaction do
       bookToBorrow=Book.find(params[:id]);
-      if bookToBorrow.available==0
+      if !bookToBorrow.present
         @success=false
-        self.addMessage('There are no more copies of this book available')
+        self.addMessage('The book could not be found')
       end
 
       if (@success==true)
@@ -253,11 +249,6 @@ class BooksController < ApplicationController
         self.checkErrors(loan)
         if (@success==true)
           loan.save
-
-          if bookToBorrow.available>0
-            bookToBorrow.available-=1
-            bookToBorrow.save
-          end
         end
       else
         ActiveRecord::Rollback
@@ -285,9 +276,6 @@ class BooksController < ApplicationController
         self.checkErrors(loan)
         if (@success==true)
           loan.save
-
-          bookToReturn.available+=1
-          bookToReturn.save
         end
       end
 
@@ -299,7 +287,40 @@ class BooksController < ApplicationController
     render json: {success: @success, message: @message, data: @data}, status: :ok
   end
 
+  def duplicate
+    user=current_user
+    book=Book.find(params[:id])
+    if book.user!=current_user
+      @success=false
+      self.addMessage("You don't own this book so you can't duplicate it.")
+    end
+
+    if @success
+      ActiveRecord::Base.transaction do
+        newBook=book.dup
+        book.images.each{ |image|
+          newImage=image.dup
+          newImage.name=image.name
+          newBook.images.push(newImage)
+        }
+        newBook.title=newBook.title+' Copy'
+        newBook.save
+        @data={
+          id: newBook.id,
+          title:newBook.title,
+          description: newBook.description,
+          author: newBook.author.blank? ? nil : "#{newBook.author.firstname} #{newBook.author.lastname}",
+          images: newBook.images,
+          cover: (cover=newBook.images.find_by_cover(true)).present? ? cover.id : nil,
+          givenTaken: newBook.loans.where(returned: false).count>0 ? true : false
+        }
+      end
+    end
+
+    render json: {success: @success, message: @message, data: @data}, status: :ok
+  end
+
   def book_params
-    params.require(:book).permit(:title, :description, :image, :quantity, :image_cache, :remove_image)
+    params.require(:book).permit(:title, :description, :image, :image_cache, :remove_image)
   end
 end
