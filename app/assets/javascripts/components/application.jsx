@@ -268,7 +268,7 @@ class Application extends React.Component {
   }
   
   handleOutsideClick(e){
-    if (/*(this.menuRef.current.contains(e.target) || */this.burgerRef.current.contains(e.target)) {
+    if (this.burgerRef.current && /*(this.menuRef.current.contains(e.target) || */this.burgerRef.current.contains(e.target)) {
       return;
     }
     if (this.showMenu==true){
