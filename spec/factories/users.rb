@@ -6,7 +6,7 @@ FactoryBot.define do
     id          1
     name        Faker::Name.name
     email       { "#{name.downcase.gsub(/\s+/, "")}@thenet.com" }
-    password  Faker::Internet.password
+    password    Faker::Internet.password
   end
     
 end

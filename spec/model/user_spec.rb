@@ -9,7 +9,7 @@ describe User do
 
   it "is not valid without password" do
     @user=build(:user)
-    @user.stub(:password).and_return(nil)
+    allow(@user).to receive(:password).and_return(nil)
     expect(@user).not_to be_valid
   end
 
