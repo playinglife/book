@@ -296,6 +296,14 @@ class BooksController < ApplicationController
     end
 
     if @success
+      book.valid?
+      self.checkErrors(book)
+      if self.hasErrors(book)
+        self.addMessage("You can't duplicate this book before filling up the required properties",false);
+      end
+    end
+
+    if @success
       ActiveRecord::Base.transaction do
         newBook=book.dup
         book.images.each{ |image|

@@ -9,18 +9,29 @@ class ApplicationController < ActionController::Base
     @data={};
   end
 
-  def addMessage(msg)
+  def addMessage(msg, toTheEnd=true)
     if msg.class.to_s=='String'
-      @message.push(msg)
+      if toTheEnd
+        @message.push(msg)
+      else
+        @message.unshift(msg)
+      end
     end
     if msg.class.to_s=='Array'
-      @message+=msg
+      if toTheEnd
+        @message+=msg
+      else
+        @message=msg+@message
+      end
     end
   end
 
-  def onlyCheckErrors(model) 
+  def hasErrors(model) 
     if (model.errors.messages.length>0)
       @success=false;
+      return true
+    else
+      return false
     end
   end
 
