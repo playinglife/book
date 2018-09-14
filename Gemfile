@@ -89,3 +89,4 @@ gem 'bootstrap4-datetime-picker-rails'
 gem 'whenever', require: false
 gem 'webpacker', '~> 3.5'
 #gem 'selenium-cucumber'
+gem 'haml'
