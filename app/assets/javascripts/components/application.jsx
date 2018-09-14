@@ -212,7 +212,7 @@ class Application extends React.Component {
             message: message,
             target: '_blank'
     },{
-	element: 'body',
+	element: $('.notifications'),
 	position: null ,
 	type: type,
 	allow_dismiss: true,
@@ -308,7 +308,7 @@ class Application extends React.Component {
             </div>
 
             <Loader />
-            <div className=".notifications.top-right"></div>
+            <div id="notifications" className=".notifications.top-right"></div>
             <ModalWin />
         </div>
       );
@@ -317,7 +317,7 @@ class Application extends React.Component {
         <div>
           <Authorize unlockToken={ this.unlockToken } resetPasswordToken={ this.resetPasswordToken } onLogin={ this.login.bind(this) }/>
           <Loader />
-          <div className=".notifications.top-right"></div>
+          <div className="notifications top-right"></div>
           <ModalWin />
         </div>
       );

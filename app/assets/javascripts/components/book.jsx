@@ -78,6 +78,7 @@ class NewBook extends React.Component{
           callbackSuccess:function(response){
             self.newBook=false;
             self.setState({book: response.data, images: [], cover: null});
+            global.app.notify('success','','Book succesfully added.<br>Please fill up the book\'s properties.');
           },
           callbackFailure:function(){},
           callbackError:function(){},
