@@ -90,3 +90,4 @@ gem 'whenever', require: false
 gem 'webpacker', '~> 3.5'
 #gem 'selenium-cucumber'
 gem 'haml'
+gem 'doorkeeper'
