@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
+  root 'welcome#index', as: :root
+
   use_doorkeeper
+
   #get 'books/index'
   #get 'books/show'
   #get 'books/create'
@@ -13,7 +16,7 @@ Rails.application.routes.draw do
   #get 'welcome/index'
   delete  'books/destroyImage/:id',   to:   'books#destroyImage'
   get     'authors/typeahead/:query', to:   'authors#typeahead'
-  
+
   get     'books/others',             to:   'books#others'
   put     'books/borrow/:id',         to:   'books#borrow'
   put     'books/return/:id',         to:   'books#return'
@@ -47,5 +50,5 @@ Rails.application.routes.draw do
         resources :books
       end
     end
-    
+
 end

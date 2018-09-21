@@ -1,24 +1,16 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Using doorkeeper
 
-Things you may want to cover:
+* access grant
 
-* Ruby version
+```curl
+curl -F grant_type=authorization_code \
+ -F client_id=4731a4a241c1a1b0f56adbc8f9b37b3e9824fb57610b395a6f3c11e88ad7e13f \
+ -F client_secret=4c7ee8f006ba18eac53e2411510ccf923ca12a3fea1d1b784ce0fcbf20e16115 \
+ -F code=ace1d79894c673b59e6fffd15633c07d1d25ace85cfe98830b34808b9950d366 \
+ -F redirect_uri=urn:ietf:wg:oauth:2.0:oob \
+ -X POST http://localhost:3000/oauth/token
+ ```
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+ * make requests with given token

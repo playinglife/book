@@ -48,6 +48,9 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+
+  # used for debugging apps
+  gem 'pry'
 end
 
 group :test do
@@ -89,5 +92,11 @@ gem 'bootstrap4-datetime-picker-rails'
 gem 'whenever', require: false
 gem 'webpacker', '~> 3.5'
 #gem 'selenium-cucumber'
+
+# use haml as a html templating engine
 gem 'haml'
+
+# doorkeeper is an OAuth 2 provider
 gem 'doorkeeper'
+# use devise-doorkeeper to use oauth2 tokens from doorkeeper and authenticate resources with devise
+gem 'devise-doorkeeper'
